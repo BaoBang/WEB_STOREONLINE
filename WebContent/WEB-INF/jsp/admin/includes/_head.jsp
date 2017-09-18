@@ -10,9 +10,9 @@
 <!-- Bootstrap 3.3.6 -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/themes/admin/bootstrap/css/bootstrap.min.css">
 <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/themes/font-awesome/css/font-awesome.min.css">
 <!-- Ionicons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/themes/font-awesome/css/ionicons.min.css">
 <!-- DataTables -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/themes/admin/plugins/datatables/dataTables.bootstrap.css">
 <!-- Theme style -->
@@ -34,7 +34,10 @@
   <link media="all" rel="stylesheet" href="${pageContext.request.contextPath}/themes/plugins/fileuploader/jquery.fileuploader-theme-thumbnails.css">
   
   
+   <!-- date range picker -->
+  <link media="all" rel="stylesheet" href="${pageContext.request.contextPath}/themes/plugins/daterangepicker/daterangepicker-bs3.css">
   
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/themes/css/admin.css">
   
   
   

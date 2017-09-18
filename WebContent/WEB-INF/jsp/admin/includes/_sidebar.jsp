@@ -14,7 +14,7 @@
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
         </div>
       </div>
-      <!-- search form -->
+      <!-- search form 
       <form action="#" method="get" class="sidebar-form">
         <div class="input-group">
           <input type="text" name="q" class="form-control" placeholder="Search...">
@@ -24,37 +24,42 @@
               </span>
         </div>
       </form>
-      <!-- /.search form -->
+      /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
-        <li class="header">MAIN NAVIGATION</li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-dashboard"></i> <span>Loại</span> <i class="fa fa-angle-left pull-right"></i>
+        <li class="header">Bảng hoạt động chính</li>
+         <li class="treeview">
+          <a href="${pageContext.request.contextPath}/admin/categories">
+            <i class="fa fa-bars"></i>
+            <span>Thể loại</span>
+            <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="../../index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
-            <li><a href="../../index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/add-new-category"><i class="fa fa-circle-o"></i> Thêm thể loại</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/categories"><i class="fa fa-circle-o"></i> Danh sách thể loại</a></li>
           </ul>
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-files-o"></i>
+            <i class="fa fa-university" aria-hidden="true"></i>
             <span>Hãng sản xuất</span>
-            <span class="label label-primary pull-right">4</span>
+             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="../layout/top-nav.html"><i class="fa fa-circle-o"></i> Top Navigation</a></li>
-            <li><a href="../layout/boxed.html"><i class="fa fa-circle-o"></i> Boxed</a></li>
-            <li><a href="../layout/fixed.html"><i class="fa fa-circle-o"></i> Fixed</a></li>
-            <li><a href="../layout/collapsed-sidebar.html"><i class="fa fa-circle-o"></i> Collapsed Sidebar</a></li>
+            <li><a href="${pageContext.request.contextPath }/admin/add-brand"><i class="fa fa-circle-o"></i>Thêm hãng</a></li>
+            <li><a href="${pageContext.request.contextPath }/admin/brand"><i class="fa fa-circle-o"></i>Danh sách hãng</a></li>
           </ul>
         </li>
-        <li>
-          <a href="../widgets.html">
-            <i class="fa fa-th"></i> <span>Sản phẩm</span>
-            <small class="label pull-right bg-green">new</small>
+         <li class="treeview">
+          <a href="#">
+           <i class="fa fa-scribd" aria-hidden="true"></i>
+            <span>Sản phẩm</span>
+             <i class="fa fa-angle-left pull-right"></i>
           </a>
+          <ul class="treeview-menu">
+            <li><a href="${pageContext.request.contextPath }/admin/add-product"><i class="fa fa-circle-o"></i>Thêm sản phẩm</a></li>
+            <li><a href="${pageContext.request.contextPath }/admin/product"><i class="fa fa-circle-o"></i>Danh sách sản phẩm</a></li>
+          </ul>
         </li>
         <li class="treeview">
           <a href="#">
@@ -69,30 +74,36 @@
             <li><a href="../charts/inline.html"><i class="fa fa-circle-o"></i> Inline charts</a></li>
           </ul>
         </li>
-        <li class="treeview">
+         <li class="treeview">
           <a href="#">
-            <i class="fa fa-laptop"></i>
+            <i class="fa fa-diamond" aria-hidden="true"></i>
+            <span>Ưu đãi</span>
+             <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="${pageContext.request.contextPath }/admin/add-promotion"><i class="fa fa-circle-o"></i>Thêm ưu đãi</a></li>
+            <li><a href="${pageContext.request.contextPath }/admin/promotion"><i class="fa fa-circle-o"></i>Danh sách ưu đãi</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="${pageContext.request.contextPath}/admin/posts">
+            <i class="fa fa-newspaper-o"></i>
             <span>Bài viết</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> General</a></li>
-            <li><a href="../UI/icons.html"><i class="fa fa-circle-o"></i> Icons</a></li>
-            <li><a href="../UI/buttons.html"><i class="fa fa-circle-o"></i> Buttons</a></li>
-            <li><a href="../UI/sliders.html"><i class="fa fa-circle-o"></i> Sliders</a></li>
-            <li><a href="../UI/timeline.html"><i class="fa fa-circle-o"></i> Timeline</a></li>
-            <li><a href="../UI/modals.html"><i class="fa fa-circle-o"></i> Modals</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/add-new-post"><i class="fa fa-circle-o"></i> Viết bài mới</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/posts"><i class="fa fa-circle-o"></i> Danh sách bài viết</a></li>
           </ul>
         </li>
         <li class="treeview">
-          <a href="#">
-            <i class="fa fa-edit"></i> <span>Thành viên</span>
+          <a href="${pageContext.request.contextPath}/admin/members">
+            <i class="fa fa-users"></i> <span>Thành viên</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="../forms/general.html"><i class="fa fa-circle-o"></i> General Elements</a></li>
-            <li><a href="../forms/advanced.html"><i class="fa fa-circle-o"></i> Advanced Elements</a></li>
-            <li><a href="../forms/editors.html"><i class="fa fa-circle-o"></i> Editors</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/add-new-account"><i class="fa fa-circle-o"></i> Thêm thành viên</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/members"><i class="fa fa-circle-o"></i> Danh sách thành viên</a></li>
           </ul>
         </li>
       </ul>

@@ -67,6 +67,7 @@ public class Account implements Serializable {
 	public Account() {
 	}
 	
+	@Transient
 	public String getFullName(){
 		return this.firstName + " " + this.lastName;
 	}

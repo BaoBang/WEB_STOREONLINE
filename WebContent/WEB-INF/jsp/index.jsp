@@ -71,10 +71,13 @@
 				<b></b> </figure>
 				<ul>
 					<c:forEach items="${posts }" var="post">
-						<li><a href="${pageContext.request.contextPath }/post/${post.slug}"> <img src="${post.image }" alt="${post.title }">
-								<h3 >${post.title }</h3> <span>6
-									phút trước</span>
-						</a></li>
+						<li>
+							<a href="${pageContext.request.contextPath }/post/${post.slug}">
+								<img src="${post.image }" alt="${post.title }">
+								<h3 >${post.title }</h3>
+								<span>Ngày đăng: <fmt:formatDate value="${post.publishDate }" pattern="dd/MM/YYYY"/></span>
+							</a>
+						</li>
 					</c:forEach>
 				</ul>
 				</aside>
@@ -106,8 +109,7 @@
 										<fmt:formatNumber value="${phone.price}" type="currency"></fmt:formatNumber>
 									</h4>
 									<div class="text-center txt-km">
-										Tiết kiệm đến <strong><fmt:formatNumber
-												value="${phone.price - phone.salePrice }" type="currency"></fmt:formatNumber></strong>
+										Tiết kiệm đến <strong><fmt:formatNumber value="${phone.price - phone.salePrice }" type="currency"></fmt:formatNumber></strong>
 									</div>
 									<span> <button type="button" class="btn btn-add-to-cart"  product-id="${phone.id}">Thêm
 											Giỏ Hàng</button>
@@ -237,6 +239,7 @@
 <!-- end./ Modal -->
 
 <jsp:include page="//WEB-INF/jsp/includes/_footer.jsp"></jsp:include>
+
 <script type="text/javascript">
 $(document).ready(function(){
 	

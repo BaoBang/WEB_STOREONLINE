@@ -7,6 +7,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,7 +171,7 @@ public class MainController {
 				accountProfile.setBiography(biography);
 				accountProfile.setEmail(email);
 				System.out.println("gender " + gender);
-				accountProfile.setGender(gender);
+				accountProfile.setGender(gender == 0 ? false : true);
 				accountProfile.setPhone(phone);
 				user.setAccountProfile(accountProfile);
 				accountProfileDAO.update(accountProfile);
@@ -224,13 +228,39 @@ public class MainController {
 		else {
 
 			List<ProductImage> productImages = productImageDAO.findByProducDetailtId(product.getProductDetail().getId());
+			String digitals = convertJSONToDigitalForm(product.getProductDetail().getDigitals());
+			model.addAttribute("digitals", digitals);
 			model.addAttribute("product", product);
 			model.addAttribute("productImages", productImages);
 			loadData(model);
 		}
 		return "product";
 	}
-	
+	private String convertJSONToDigitalForm(String jSON) {
+		String digitals = "";
+		JSONParser jsonParser = new JSONParser();
+		try {
+			JSONArray jsonArray = (JSONArray) jsonParser.parse(jSON);
+
+			for (int i = 0; i < jsonArray.size(); i++) {
+				JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+				String category = (String) jsonObject.get("category");
+				digitals += "<li class='digital-title'>" + category + "</li>";
+
+				JSONArray jsonArray2 = (JSONArray) jsonObject.get("list");
+				for (int j = 0; j < jsonArray2.size(); j++) {
+					JSONObject jsonObject2 = (JSONObject) jsonArray2.get(j);
+					digitals += "<li> <label>" + jsonObject2.get("name") + ":" + "</label><span>" + jsonObject2.get("value")
+							+ "</span> </li>";
+
+				}
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return digitals;
+	}
 	
 	/*******************************************************************************************/
 	/********************************* CATEGORY PAGE *******************************************/

@@ -87,8 +87,8 @@
 									</c:forEach>
 								</c:if>
 							</div>
-							<a href="#" class="btn btn-add-to-cart mr-0 ml-0"
-								style="visibility: visible;">Thêm Giỏ Hàng</a>
+							<button type="button" class="btn btn-add-to-cart"  product-id="${product.id}" style="visibility: visible;">Thêm
+											Giỏ Hàng</button>
 						</div>
 					</div>
 				</div>
@@ -113,7 +113,7 @@
 						</div>
 						<div class="tab-pane" id="digital" role="tabpanel">
 							<ul class="digital-ul">
-							${product.productDetail.digitals}
+							${digitals}
 							</ul>
 						</div>
 
@@ -127,8 +127,94 @@
 		</div>
 	</div>
 	<!-- END ./CONTENT -->
-
+<!-- Modal -->
+<div class="modal fade" id="modalAddToCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Message</h5>
+        <button type="button" class="close btn-close-modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-close-modal">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end./ Modal -->
 
 	<jsp:include page="//WEB-INF/jsp/includes/_footer.jsp"></jsp:include>
+	<script type="text/javascript">
+$(document).ready(function(){
+	
+	
+	// Close Modal
+	$('.btn-close-modal').click(function(){
+		$('#modalAddToCart').modal('hide');
+	});
+	
+	//onclick Add-To-Cart
+	$('.btn-add-to-cart').click(function(){
+		var productId = $(this).attr('product-id');
+		
+		// AJAX: /ajax/add-to-cart
+		$.ajax({
+            url : "${pageContext.request.contextPath}/ajax/add-to-cart",
+            type : "get",
+            contentType : "application/json;charset=UTF-8",
+            dataType:"text",
+            data : {
+                 product_id:productId,
+                 quantity:1
+            },
+            /* timeout : 100000, */
+            success : function(result) {
+                console.log("SUCCESS: ", result);
+                
+                $('.modal-body').html('<p class="text-success">Thêm thành công <strong>' + result + '</strong> vào giỏ hàng.</p>');
+                $('#modalAddToCart').modal('show');
+                
+                reload_cart_list();
+                var totalCart = $('#total-product-in-cart').text();
+                $('#total-product-in-cart').text(Number(totalCart) + 1);
+                
+             	// 2 giay sau sẽ tắt popup
+                /* setTimeout(function(){
+                    $('#modalAddToCart').modal('hide');
+                }, 2000); */
+            },
+            error : function(e) {
+                console.log("ERROR: ", e);
+                $('.modal-body').html('<p class="text-danger">Thêm vào giỏ hàng thất bại!</p>');
+                $('#modalAddToCart').modal('show');
+            }
+        });
+	});
+	
+	// reload carts
+	function reload_cart_list(){
+		$.ajax({
+			url : "${pageContext.request.contextPath}/ajax/cart-list",
+            type : "get",
+            contentType : "application/json;charset=UTF-8",
+            dataType: "text",
+            success : function(data) {
+               console.log("SUCCESS: ", data);
+			   $('#container-cart').empty();
+			   $('#container-cart').html(data);
+		
+           },
+           error : function(e) {
+               console.log("ERROR: ", e);
+
+           }
+		});
+	};
+
+});
+</script>
 </body>
 </html>

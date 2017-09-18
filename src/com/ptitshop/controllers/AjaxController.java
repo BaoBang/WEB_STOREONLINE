@@ -1,6 +1,7 @@
 package com.ptitshop.controllers;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,11 +22,16 @@ import com.ptitshop.dao.BrandDAO;
 import com.ptitshop.dao.CategoryDAO;
 import com.ptitshop.dao.PostDAO;
 import com.ptitshop.dao.ProductDAO;
+import com.ptitshop.dao.ProductDetailDAO;
+import com.ptitshop.dao.ProductImageDAO;
+import com.ptitshop.dao.PromotionDAO;
 import com.ptitshop.entities.Account;
 import com.ptitshop.entities.Brand;
 import com.ptitshop.entities.Category;
 import com.ptitshop.entities.Post;
 import com.ptitshop.entities.Product;
+import com.ptitshop.entities.ProductImage;
+import com.ptitshop.entities.Promotion;
 import com.ptitshop.models.Cart;
 import com.ptitshop.models.CartList;
 import com.ptitshop.utils.Constants;
@@ -34,7 +40,7 @@ import com.ptitshop.utils.MD5Hash;
 @Controller
 @Transactional
 @EnableWebMvc
-@RequestMapping(value="/ajax")
+@RequestMapping(value = "/ajax")
 public class AjaxController {
 
 	@Autowired
@@ -47,70 +53,71 @@ public class AjaxController {
 	private PostDAO postDAO;
 	@Autowired
 	private CategoryDAO categoryDAO;
-	
-	
+	@Autowired
+	private ProductImageDAO productImageDAO;
+	@Autowired
+	private PromotionDAO promotionDAO;
+	@Autowired
+	private ProductDetailDAO productDetailDAO;
+
 	/*******************************************************************************************/
 	/**************************************** TAM **********************************************/
 	/*******************************************************************************************/
 	@ResponseBody
-	@RequestMapping(value= {"/add-to-cart"}, method=RequestMethod.GET)
-	public String addToCartAJAX(
-			HttpServletRequest request,
-			@RequestParam(name="product_id", required=true) int productId,
-			@RequestParam(name="quantity", required=false, defaultValue="1") int quantity){
-		
+	@RequestMapping(value = { "/add-to-cart" }, method = RequestMethod.GET)
+	public String addToCartAJAX(HttpServletRequest request,
+			@RequestParam(name = "product_id", required = true) int productId,
+			@RequestParam(name = "quantity", required = false, defaultValue = "1") int quantity) {
+
 		System.out.println("## AJAX add-to-cart: " + productId);
-		
+
 		Product product = productDAO.findById(productId);
-		
+
 		Cart cart = new Cart(quantity, product);
-		
+
 		HttpSession session = request.getSession();
-		
+
 		CartList cartList = (CartList) session.getAttribute("CART_LIST");
-		if (cartList == null) 
+		if (cartList == null)
 			cartList = new CartList();
-		
+
 		cartList.addCart(cart);
-		
+
 		session.setAttribute("CART_LIST", cartList);
-		
+
 		return product.getName();
 	}
-	
-	
+
 	@ResponseBody
-	@RequestMapping(value="/remove-product-from-cart", method=RequestMethod.GET)
-	public String removeProductFromCarts(
-			HttpServletRequest request,
-			@RequestParam(name="product_id", required=true) int productId){
-		
+	@RequestMapping(value = "/remove-product-from-cart", method = RequestMethod.GET)
+	public String removeProductFromCarts(HttpServletRequest request,
+			@RequestParam(name = "product_id", required = true) int productId) {
+
 		System.out.println("## AJAX reomve from carts: " + productId);
 		Product product = productDAO.findById(productId);
-		if (product != null){
+		if (product != null) {
 			HttpSession session = request.getSession();
 			CartList cartList = (CartList) session.getAttribute("CART_LIST");
-			if (cartList != null){
+			if (cartList != null) {
 				boolean result = cartList.removeCart(product);
-				if (result) 
+				if (result)
 					return "true";
 			}
 		}
 		return "false";
 	}
-	
-	
-	@RequestMapping(value="/cart-list", method=RequestMethod.GET)
-	public String getCartList(Model model, HttpServletRequest request){
+
+	@RequestMapping(value = "/cart-list", method = RequestMethod.GET)
+	public String getCartList(Model model, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		CartList cartList = (CartList) session.getAttribute("CART_LIST");
 		model.addAttribute("cart_list", cartList);
 		return "/includes/_cart-list";
 	}
-	
+
 	@ResponseBody
-	@RequestMapping(value= {"/delete-post-with-ajax"}, method=RequestMethod.GET)
-	public String deletePostWithAjax(@RequestParam(required=true, name="post_id") int postId) {
+	@RequestMapping(value = { "/delete-post-with-ajax" }, method = RequestMethod.GET)
+	public String deletePostWithAjax(@RequestParam(required = true, name = "post_id") int postId) {
 		Post post = postDAO.findById(postId);
 		if (post != null) {
 			postDAO.delete(post);
@@ -118,11 +125,10 @@ public class AjaxController {
 		}
 		return "false";
 	}
-	
-	
+
 	@ResponseBody
-	@RequestMapping(value= {"/delete-caregory-with-ajax"}, method=RequestMethod.GET)
-	public String deleteCategoryWithAjax(@RequestParam(required=true, name="category_id") int categoryId) {
+	@RequestMapping(value = { "/delete-caregory-with-ajax" }, method = RequestMethod.GET)
+	public String deleteCategoryWithAjax(@RequestParam(required = true, name = "category_id") int categoryId) {
 		Category category = categoryDAO.findById(categoryId);
 		if (category != null) {
 			categoryDAO.delete(category);
@@ -130,12 +136,11 @@ public class AjaxController {
 		}
 		return "false";
 	}
-	
-	
+
 	/*******************************************************************************************/
 	/*************************************** BANG **********************************************/
 	/*******************************************************************************************/
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/check-user-name", method = RequestMethod.GET)
 	public String checkUserName(HttpServletResponse response,
@@ -238,4 +243,79 @@ public class AjaxController {
 		return "false";
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/remove-product", method = RequestMethod.GET)
+	public String removeProduct(HttpServletRequest request,
+			@RequestParam(name = "product_id", required = true) int productId) {
+
+		System.out.println("## AJAX reomve from csdl: " + productId);
+		Product product = productDAO.findById(productId);
+		if (product != null) {
+
+			List<ProductImage> images = productImageDAO.findByProducDetailtId(product.getProductDetail().getId());
+			boolean resultImages = false;
+			for (ProductImage image : images) {
+				System.out.println("id: " + image.getId());
+				resultImages = productImageDAO.remove(image);
+				if (!resultImages)
+					return "false";
+			}
+			boolean result = productDAO.remove(product);
+			if (!result)
+				return "false";
+			boolean resultDetail = productDetailDAO.remove(product.getProductDetail());
+			if (!resultDetail)
+				return "false";
+			return "true";
+		}
+		return "false";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/remove-promotion", method = RequestMethod.GET)
+	public String removePromotion(HttpServletRequest request,
+			@RequestParam(name = "promotion_id", required = true) int promotionId) {
+
+		System.out.println("## AJAX reomve from csdl: " + promotionId);
+		Promotion promotion = promotionDAO.findById(promotionId);
+		if (promotion != null) {
+
+			boolean result = promotionDAO.remove(promotion);
+			if (result)
+				return "true";
+		}
+		return "false";
+	}
+
+	@SuppressWarnings("el-syntax")
+	@ResponseBody
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public String search(HttpServletResponse response, HttpServletRequest request,
+			@RequestParam(name = "inputdata", required = true, defaultValue = "") String inputData) throws IOException {
+		if (inputData.equals("")) {
+			return "";
+		}
+		List<Product> resultSearchList = productDAO.searchByName(inputData);
+		String html = "";
+		if (resultSearchList.size() > 0) {
+			html += "<div><h4>Có " + resultSearchList.size() + " sản phẩm được tìm thấy</h4></div>";
+		}
+		html += "<ul>";
+		int index = 0;
+		for (Product p : resultSearchList) {
+			html += "<li><a><p><img src=\"" + p.getImage() + "\"alt=\"" + p.getName() + "\" ></p><div><h3>"
+					+ p.getName()
+					+ "</h3><del class=\"search-price\"><fmt:formatNumber value=\"${" + p.getPrice() +"}\" type=\"currency\"></fmt:formatNumber></del><span class=\"search-price\"><fmt:formatNumber value=\"${"+ p.getSalePrice() +"}\" type=\"currency\"></fmt:formatNumber></span></div></a></li>";
+			if (++index == 5)
+				break;
+		}
+		html += "</ul>";
+		if (resultSearchList.size() > 5) {
+			System.out.println("con;  "+ request.getContextPath());
+			
+			html += "<div><a href=\""+ request.getContextPath() +"/category/phone\">Xem thêm</a></div>";
+		}
+		return html;
+
+	}
 }

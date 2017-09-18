@@ -39,7 +39,7 @@ public class BrandDAOImpl implements BrandDAO {
 		try {
 			Session sesion = sessionFactory.openSession();
 			sesion.beginTransaction();
-			sesion.saveOrUpdate(brand);
+			sesion.save(brand);
 			sesion.getTransaction().commit();
 			return true;
 		} catch (Exception e) {
@@ -53,7 +53,7 @@ public class BrandDAOImpl implements BrandDAO {
 		try {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
-			session.saveOrUpdate(brand);
+			session.update(brand);
 			session.getTransaction().commit();
 			return true;
 		} catch (Exception e) {

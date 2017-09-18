@@ -33,7 +33,7 @@ public class ProductImageDAOImpl implements ProductImageDAO {
 		try {
 			Session sesion = sessionFactory.openSession();
 			sesion.beginTransaction();
-			sesion.saveOrUpdate(image);
+			sesion.save(image);
 			sesion.getTransaction().commit();
 			return true;
 		} catch (Exception e) {
@@ -46,7 +46,7 @@ public class ProductImageDAOImpl implements ProductImageDAO {
 		try {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
-			session.saveOrUpdate(image);
+			session.update(image);
 			session.getTransaction().commit();
 			return true;
 		} catch (Exception e) {

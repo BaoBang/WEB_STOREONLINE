@@ -32,7 +32,7 @@
 				<div class="col-md-12">
 					<div class="box">
 						<div class="box-header">
-							<h3 class="box-title">HÃNG SẢN XUẤT</h3>
+							<h3 class="box-title">DANH SÁCH SẢN PHẨM</h3>
 						</div>
 						<!-- /.box-header -->
 						<div class="box-body">
@@ -54,12 +54,12 @@
 									</tr>
 								</thead>
 								<tbody>
-									<c:forEach var="p" items="${result.list}">
-										<tr>
-											<td>${p.id}</td>
+									<c:forEach var="p" items="${result}">
+										<tr id="${p.id }">
+											<td class="">${p.id}</td>
 											<td class="post-img">
 												<img src="${p.image}" alt="${p.image }" width="150px" height="200px"></td>
-											<td>${p.name}</td>
+											<td class="large-cell">${p.name}</td>
 											<td>${p.category.name}</td>
 											<td>${p.brand.name }</td>
 											<td><fmt:formatNumber type="currency" value="${p.price }" /></td>
@@ -86,12 +86,13 @@
 												</a>
 											</td>
 											<td>
-												<a class="btn btn-info " href="${pageContext.request.contextPath }/admin/add-brand?brand-id=${p.id}">
+												<a class="btn btn-info " href="${pageContext.request.contextPath }/admin/edit-product/${p.id}">
 													<i class="fa fa-pencil-square-o"></i>
 												</a> 
-												<a class="btn btn-danger " href="#">
-													<i class="fa fa-times"></i>
-												</a>
+												<button type="button" product-name="${p.name}"
+														product-id="${p.id}" class="btn btn-danger btn-remove-product">
+														<i class="fa fa-times"></i>
+													</button>
 											</td>
 										</tr>
 									</c:forEach>
@@ -115,17 +116,6 @@
 							</table>
 						</div>
 						<!-- /.box-body -->
-
-						<div class="box-footer clearfix">
-							<ul class="pagination pagination-sm no-margin pull-right">
-								<li><a href="#">&laquo;</a></li>
-								<li><a href="#">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">3</a></li>
-								<li><a href="#">&raquo;</a></li>
-							</ul>
-						</div>
-
 					</div>
 					<!-- /.box -->
 				</div>
@@ -133,11 +123,83 @@
 			</div>
 			<!-- /.row --> </section>
 			<!-- /.content -->
-
+		<!-- Modal -->
+			<div class="modal fade" id="modalRemoveProduct" tabindex="-1"
+				role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Message</h5>
+							<button type="button" class="close btn-close-modal"
+								data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary btn-close-modal"
+								data-dismiss="modal">Close</button>
+							<button id="btn-remove-product-from-list" type="button"
+								product-name="" product-id="" class="btn btn-danger">Delete</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end./ Modal -->
 		</div>
 		<!-- /.content-wrapper -->
-
+		
 
 		<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				// scroll
+				 $('#example1').DataTable( {
+			        "scrollX": true,
+			        "fnDrawCallback": function( oSettings ) {
+			        	showModal();
+			        }
+			    } );
+				// close modal
+				$('.btn-close-modal').click(function() {
+					$('#modalRemoveProduct').modal('hide');
+				});
+				// show modal
+				function showModal(){
+					$('.btn-remove-product').click(function() {
+						var productName = $(this).attr('product-name');
+						var productId = $(this).attr('product-id');
+						$('#btn-remove-product-from-list').attr('product-id',productId);
+						$('.modal-body').html('<p class="text-danger">Bạn chắc chắn muốn xóa <strong>'
+												+ productName+ '</strong> khỏi danh sách không?</p>');
+						$('#modalRemoveProduct').modal('show');
+					});
+					}
+				
+				$('#btn-remove-product-from-list').click(function() {
+					var productId = $(this).attr('product-id');
+					// AJAX: /ajax/remove-product-from-cart
+					$.ajax({url : "${pageContext.request.contextPath}/ajax/remove-product",
+							type : "get",
+							contentType : "application/json;charset=UTF-8",
+							dataType : "text",
+							data : {product_id : productId},
+							success : function(result) {
+										console.log("SUCCESS: ",result);
+											if (result == 'true') {
+												$('#modalRemoveProduct').modal('hide');
+												var id = '#'+ productId;
+												$(id).remove();
+											} else {
+												$('.modal-body').html('<p class="text-danger">Không thể xóa sản phẩm!</p>');
+												$('#modalRemoveProduct').modal('show');
+											}
+							},
+							error : function(e) {console.log("ERROR: ",e);
+											$('.modal-body').html('<p class="text-danger">Đã có lỗi xảy ra!</p>');
+											$('#modalRemoveProduct').modal('show');
+									}
+				});});});
+		</script>
 </body>
 </html>

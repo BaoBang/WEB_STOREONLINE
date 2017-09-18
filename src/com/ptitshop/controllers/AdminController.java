@@ -1,5 +1,6 @@
 package com.ptitshop.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,7 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.ptitshop.dao.AccountDAO;
@@ -36,6 +43,7 @@ import com.ptitshop.entities.ProductImage;
 import com.ptitshop.entities.Promotion;
 import com.ptitshop.models.ResultPagination;
 import com.ptitshop.utils.Constants;
+import com.ptitshop.utils.MD5Hash;
 import com.ptitshop.utils.MyUtils;
 
 @Controller
@@ -68,9 +76,31 @@ public class AdminController {
 	@Autowired
 	private ProductDetailDAO productDetailDAO;
 
+	@ResponseBody
 	@RequestMapping(value = "/test")
 	public String test() {
-		return "/admin/brank";
+		Product product = productDAO.findById(5);
+
+		Promotion promotion1 = promotionDAO.findById(1);
+		// Promotion promotion2 = promotionDAO.findById(2);
+		// Promotion promotion3 = promotionDAO.findById(3);
+
+		// List<Promotion> list = product.getPromotions();
+		// list.add(promotion3);
+		// list.add(promotion1);
+		// product.setPromotions(list);
+
+		// List<Product> list2 = promotion3.getProducts();
+		// list2.add(product);
+		// promotion3.setProducts(list2);
+
+		promotion1.getProducts().add(product);
+
+		promotionDAO.merge(promotion1);
+		// promotionDAO.test(promotion3);
+		productDAO.merge(product);
+
+		return "test thui mà...";
 	}
 
 	private void loadData(Model model) {
@@ -83,14 +113,15 @@ public class AdminController {
 	}
 
 	/*******************************************************************************************/
-	/************************************ ERROR PAGE *******************************************/
+	/************************************
+	 * ERROR PAGE
+	 *******************************************/
 	/*******************************************************************************************/
-	@RequestMapping(value="/403", method=RequestMethod.GET)
+	@RequestMapping(value = "/403", method = RequestMethod.GET)
 	public String errorAdmin403() {
 		return "/admin/403";
 	}
 
-	
 	/*******************************************************************************************/
 	/**************************************
 	 * Brand PAGE
@@ -105,12 +136,12 @@ public class AdminController {
 		return "/admin/brand";
 	}
 
-	@RequestMapping(value = "/add-brand", method = RequestMethod.GET)
+	@RequestMapping(value = "/add-brand")
 	public String addBrand(Model model, HttpServletRequest request,
 			@RequestParam(required = false, name = "page", defaultValue = "1") int page,
 			@RequestParam(required = true, name = "brandid", defaultValue = "0") int brandId,
 			@RequestParam(required = true, name = "brandname", defaultValue = "") String brandName,
-			@RequestParam(required = true, name = "files[]", defaultValue = "") String brandImage,
+			@RequestParam(required = true, name = "brandimage", defaultValue = "") String brandImage,
 			@RequestParam(required = true, name = "brandstatus", defaultValue = "1") int brandStatus) {
 		Brand brand = brandDAO.findByBrandName(brandName);
 		String error = "";
@@ -134,19 +165,18 @@ public class AdminController {
 		return "/admin/add-brand";
 	}
 
-	@RequestMapping(value = "/edit-brand/{brandId}", method = RequestMethod.GET)
-	public String editBrand(Model model, HttpServletRequest request,
-			@PathVariable("brandId") int brandId,
+	@RequestMapping(value = "/edit-brand/{brandId}")
+	public String editBrand(Model model, HttpServletRequest request, @PathVariable("brandId") int brandId,
 			@RequestParam(required = true, name = "brandname", defaultValue = "") String brandName,
 			@RequestParam(required = true, name = "brandimage", defaultValue = "") String brandImage,
-			@RequestParam(required = true, name = "brandstatus", defaultValue = "1") int brandStatus
-			) {
+			@RequestParam(required = true, name = "brandstatus", defaultValue = "1") int brandStatus) {
 		Brand brand = brandDAO.findById(brandId);
 		String error = "";
 		if (request.getParameter("submit") != null) {
 			if (brand != null) {
 				brand.setName(brandName);
 				brand.setImage(brandImage);
+				System.out.println(brandImage);
 				brand.setStatus(brandStatus);
 				brandDAO.update(brand);
 				error = "Cập nhật thành công công hãng " + brand.getName() + " vào csdl.";
@@ -162,18 +192,131 @@ public class AdminController {
 	/*******************************************************************************************/
 	/************************************** PRODUCT *******************************************/
 	/*******************************************************************************************/
-	@RequestMapping(value = "/product", method = RequestMethod.GET)
-	public String product(Model model, @RequestParam(required = false, name = "page", defaultValue = "1") int page) {
-		List<Product> productList = productDAO.findAllByPagination(page);
-		int totalPage = productDAO.getTotalPage();
-		ResultPagination<Product> result = new ResultPagination<>(page, totalPage, productList);
+	@RequestMapping(value = "/product")
+	public String product(Model model, @RequestParam(required = false, name = "page", defaultValue = "2") int page) {
+		List<Product> result = productDAO.findAll();
+
 		model.addAttribute("result", result);
 		return "/admin/product";
 	}
 
-	@RequestMapping(value = "/add-product", method = RequestMethod.GET)
+	private void insertProductImage(List<ProductImage> productImages) {
+		for (ProductImage image : productImages) {
+			productImageDAO.insert(image);
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void updateProductImage(List<ProductImage> productImages) {
+		for (ProductImage image : productImages) {
+			productImageDAO.update(image);
+		}
+	}
+
+	private void deleteProductImage(List<ProductImage> productImages) {
+		for (ProductImage image : productImages) {
+			productImageDAO.remove(image);
+		}
+	}
+
+	private List<Promotion> getPromotion(Product product, String promotionStrs[]) {
+		List<Promotion> promotions = new ArrayList<>();
+		for (int i = 0; i < promotionStrs.length; i++) {
+			Promotion promotion = promotionDAO.findById(Integer.parseInt(promotionStrs[i]));
+			promotion.getProducts().add(product);
+			promotionDAO.update(promotion);
+			promotions.add(promotion);
+		}
+		return promotions;
+	}
+
+	private List<ProductImage> getProductImages(String[] images, ProductDetail productDetail) {
+		List<ProductImage> productImages = new ArrayList<>();
+		for (int i = 0; i < images.length; i++) {
+			if (!images[i].equals("")) {
+				ProductImage image = new ProductImage();
+				image.setId(Constants.DEUFAULT_ID);
+				image.setUrl(images[i]);
+				image.setProductDetail(productDetail);
+				productImages.add(image);
+			}
+		}
+		return productImages;
+	}
+
+	private String getOverView(String[] digitalDetails) {
+		String overview = "";
+		if (digitalDetails.length > 2) {
+			for (int i = 2; i < digitalDetails.length; i += 2) {
+				if (digitalDetails[i + 1].equals("/")) {
+					break;
+				} else {
+					overview += "<span>" + digitalDetails[i] + ":" + digitalDetails[i + 1] + "</span>";
+				}
+			}
+		}
+		return overview;
+	}
+
+	private String pasreToJSONDigitals(String digitalDetails[]) {
+		String sjons = "[";
+		for (int i = 0; i < digitalDetails.length; i += 2) {
+			if (digitalDetails[i + 1].equals("/")) {
+				if (i > 1) {
+					sjons += "]}";
+					if (i < digitalDetails.length)
+						sjons += ",";
+				}
+				sjons += "{\"category\":" + "\"" + digitalDetails[i] + "\",\"list\":[";
+			} else {
+				sjons += "{\"name\":" + "\"" + digitalDetails[i] + "\",\"value\":\"" + digitalDetails[i + 1] + "\"}";
+				if (i + 2 < digitalDetails.length && !digitalDetails[i + 3].equals("/")) {
+					sjons += ",";
+				}
+			}
+		}
+		sjons += "]}]";
+		return sjons;
+	}
+
+	private String convertJSONToDigitalAdminForm(String jSON) {
+		String digitals = "";
+		JSONParser jsonParser = new JSONParser();
+		int index = 0;
+		try {
+			JSONArray jsonArray = (JSONArray) jsonParser.parse(jSON);
+
+			for (int i = 0; i < jsonArray.size(); i++) {
+				JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+				String category = (String) jsonObject.get("category");
+				digitals += "<li id='" + index++
+						+ "'><input class='form-control input-digital-title' placeholder='Nhập vào loại thông số' name='digital-details' value='"
+						+ category + "'><input type='hidden' value='/' name='digital-details'><a li-id='" + index
+						+ "' class='delete-input'><i class='fa fa-time'></i></a></li>";
+
+				JSONArray jsonArray2 = (JSONArray) jsonObject.get("list");
+				for (int j = 0; j < jsonArray2.size(); j++) {
+					JSONObject jsonObject2 = (JSONObject) jsonArray2.get(j);
+					digitals += "<li id='" + index
+							+ "'><input class='form-control input-digital-lable' placeholder='Nhập vào tên thông số' name='digital-details' value='"
+							+ jsonObject2.get("name")
+							+ "'><input class='form-control input-digital-span' placeholder='Nhập vào giá trị thông số' name='digital-details' value='"
+							+ jsonObject2.get("value") + "'><a li-id='" + index++
+							+ "' class='delete-input'><i class='fa fa-times'></i></a></li>";
+
+				}
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return digitals;
+	}
+
+	@RequestMapping(value = "/add-product")
 	public String addProduct(Model model, HttpServletRequest request,
 			@RequestParam(required = true, name = "productname", defaultValue = "") String productName,
+			@RequestParam(required = true, name = "productimage", defaultValue = "") String productImage,
 			@RequestParam(required = true, name = "productcategory", defaultValue = "0") int productCategoryId,
 			@RequestParam(required = true, name = "productbrand", defaultValue = "0") int productBrandId,
 			@RequestParam(required = true, name = "productprice", defaultValue = "0") double productPrice,
@@ -203,11 +346,12 @@ public class AdminController {
 
 			// image
 			List<ProductImage> productImages = new ArrayList<>();
-			if (request.getParameterValues("files[]") != null) {
-				String images[] = request.getParameterValues("files[]");
+			if (request.getParameterValues("productimage") != null) {
+				String images[] = productImage.split("\n");
+				System.out.println("len : " + images.length);
 				productImages = getProductImages(images, productDetail);
 				if (images.length > 0) {
-					product.setImage("/PTiTShop/uploads/" + images[Constants.ZERO_NUMBER]);
+					product.setImage(images[Constants.ZERO_NUMBER]);
 				}
 			}
 			// overview + digital
@@ -215,128 +359,250 @@ public class AdminController {
 			String overview = "";
 			if (request.getParameterValues("digital-details") != null) {
 				String digitalDetails[] = request.getParameterValues("digital-details");
-				digitals = getDigital(digitalDetails);
+				digitals = pasreToJSONDigitals(digitalDetails);
 				overview = getOverView(digitalDetails);
 			}
 			product.setOverview(overview);
 			productDetail.setDigitals(digitals);
-			// promotions
+
+			// 1 insert product detail
+			productDetailDAO.insert(productDetail);
+			product.setProductDetail(productDetail);
+			// 2 insert product images
+			insertProductImage(productImages);
+			productDetail.setProductImages(productImages);
+			// 4 insert product
+			productDAO.insert(product);
+			// 3 promotions
 			List<Promotion> promotions = new ArrayList<>();
 			if (request.getParameterValues("promotions") != null) {
 				String promotionStrs[] = request.getParameterValues("promotions");
-				promotions = getPromotion(promotionStrs);
+				promotions = getPromotion(product, promotionStrs);
 			}
 			product.setPromotions(promotions);
-			// insert product detail
-			productDetailDAO.insert(productDetail);
-			product.setProductDetail(productDetail);
-			// insert product images
-			insertProductImage(productImages);
-			productDetail.setProductImages(productImages);
-			// insert product
-			productDAO.insert(product);
-			//product.setPromotions(promotions);
+
 			message = "Thêm thành công sản phẩm " + product.getName() + " vào cơ sở dữ liệu";
-			
+
 		}
 		model.addAttribute("message", message);
 		return "/admin/add-product";
 	}
 
-	private void insertProductImage(List<ProductImage> productImages) {
-		for (ProductImage image : productImages) {
-			productImageDAO.insert(image);
-		}
-	}
-
-	private List<Promotion> getPromotion(String promotionStrs[]) {
-		List<Promotion> promotions = new ArrayList<>();
-		for (int i = 0; i < promotionStrs.length; i++) {
-			promotions.add(promotionDAO.findById(Integer.parseInt(promotionStrs[i])));
-		}
-		return promotions;
-	}
-
-	private List<ProductImage> getProductImages(String[] images, ProductDetail productDetail) {
-		List<ProductImage> productImages = new ArrayList<>();
-		for (int i = 0; i < images.length; i++) {
-			if (!images[i].equals("")) {
-				ProductImage image = new ProductImage();
-				image.setId(Constants.DEUFAULT_ID);
-				image.setUrl("/PTiTShop/uploads/" + images[i]);
-				image.setProductDetail(productDetail);
-				productImages.add(image);
-			}
-		}
-		return productImages;
-	}
-
-	private String getOverView(String[] digitalDetails) {
-		String overview = "";
-		if (digitalDetails.length > 2) {
-			for (int i = 2; i < digitalDetails.length; i += 2) {
-				if (digitalDetails[i + 1].equals("/")) {
-					break;
-				} else {
-					overview += "<span>" + digitalDetails[i] + ":" + digitalDetails[i + 1] + "</span>";
+	@RequestMapping(value = "/edit-product/{productId}")
+	public String eidtProduct(Model model, HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("productId") int productId,
+			@RequestParam(required = true, name = "productname", defaultValue = "") String productName,
+			@RequestParam(required = true, name = "productimage", defaultValue = "") String productImage,
+			@RequestParam(required = true, name = "productcategory", defaultValue = "0") int productCategoryId,
+			@RequestParam(required = true, name = "productbrand", defaultValue = "0") int productBrandId,
+			@RequestParam(required = true, name = "productprice", defaultValue = "0") double productPrice,
+			@RequestParam(required = true, name = "productsaleprice", defaultValue = "0") double productSalePrice,
+			@RequestParam(required = true, name = "productquantity", defaultValue = "0") int productQuantity,
+			@RequestParam(required = true, name = "productdescription", defaultValue = "") String productDescription,
+			@RequestParam(required = true, name = "productstatus", defaultValue = "1") int productStatus)
+			throws IOException {
+		loadData(model);
+		String message = "";
+		Product product = productDAO.findById(productId);
+		if (request.getParameter("submit") != null) {
+			if (product != null) {
+				product.setBrand(brandDAO.findById(productBrandId));
+				product.setCategory(categoryDAO.findById(productCategoryId));
+				product.setName(productName);
+				product.setPrice(productPrice);
+				product.setSalePrice(productSalePrice);
+				product.setStatus(productStatus);
+				// detail
+				ProductDetail productDetail = product.getProductDetail();
+				productDetail.setDescription(productDescription);
+				productDetail.setQuantity(productQuantity);
+				// overview
+				String digitals = "";
+				String overview = "";
+				if (request.getParameterValues("digital-details") != null) {
+					String digitalDetails[] = request.getParameterValues("digital-details");
+					digitals = pasreToJSONDigitals(digitalDetails);
+					overview = getOverView(digitalDetails);
 				}
+				product.setOverview(overview);
+				productDetail.setDigitals(digitals);
+				// image
+				List<ProductImage> productImages = new ArrayList<>();
+				if (request.getParameterValues("productimage") != null) {
+					System.out.println(productImage);
+					String images[] = productImage.split("\n");
+					productImages = getProductImages(images, productDetail);
+					if (images.length > 0) {
+						product.setImage(images[Constants.ZERO_NUMBER]);
+					}
+				}
+				// promotions
+				List<Promotion> promotions = new ArrayList<>();
+				if (request.getParameterValues("promotions") != null) {
+					String promotionStrs[] = request.getParameterValues("promotions");
+					promotions = getPromotion(product, promotionStrs);
+				}
+				// product.setPromotions(promotions);
+				// 1 update product detail
+
+				productDetailDAO.update(productDetail);
+				product.setProductDetail(productDetail);
+				System.out.println(product.getProductDetail().getDescription());
+				// 2 update product images
+				deleteProductImage(productImageDAO.findByProducDetailtId(productDetail.getId()));
+				insertProductImage(productImages);
+				productDetail.setProductImages(productImages);
+				// 3 update product
+				productDAO.update(product);
+				message = "Cập nhật thành công sản phẩm " + product.getName() + ".";
+				model.addAttribute("message", message);
+				response.sendRedirect(request.getContextPath() + "/admin/product");
+			} else {
+				message = "Cập nhật thất bại";
 			}
 		}
-		return overview;
+		String productImageStrings = getImageList(product);
+		System.out.println(productImageStrings);
+		model.addAttribute("digitalDetails", convertJSONToDigitalAdminForm(product.getProductDetail().getDigitals()));
+		model.addAttribute("message", message);
+		model.addAttribute("productImageStrings", productImageStrings);
+		model.addAttribute(product);
+		return "/admin/edit-product";
 	}
 
-	private String getDigital(String digitalDetails[]) {
-		String digitals = "";
-		if (digitalDetails.length > 0) {
-			for (int i = 0; i < digitalDetails.length; i += 2) {
-				if (digitalDetails[i + 1].equals("/")) {
-					digitals += "<li class='digital-title'>" + digitalDetails[i] + "</li>";
-				} else {
-					digitals += "<li> <lable>" + digitalDetails[i] + ":" + "</lable><span>" + digitalDetails[i + 1]
-							+ "</span> </li>";
-				}
+	private String getImageList(Product product) {
+		String imageStr = "";
+		if (product != null) {
+			List<ProductImage> images = productImageDAO.findByProducDetailtId(product.getProductDetail().getId());
+			for (ProductImage image : images) {
+				imageStr += image.getUrl() + "\n";
 			}
 		}
-		return digitals;
+		return imageStr;
 	}
+
 	/*******************************************************************************************/
-	/************************************* POST PAGE *******************************************/
+	/**************************************
+	 * PROMOTION PAGE
+	 *****************************************/
 	/*******************************************************************************************/
-	@RequestMapping(value="/posts", method=RequestMethod.GET)
-	public String postList(Model model, @RequestParam(required=false, name="page", defaultValue="1") int page){
+	@RequestMapping(value = "/promotion", method = RequestMethod.GET)
+	public String promotion(Model model, @RequestParam(required = false, name = "page", defaultValue = "1") int page) {
+		List<Promotion> promotionList = promotionDAO.findAllByPagination(page);
+		int totalPage = promotionDAO.getTotalPage();
+		ResultPagination<Promotion> result = new ResultPagination<>(page, totalPage, promotionList);
+		model.addAttribute("result", result);
+		return "/admin/promotion";
+	}
+
+	@SuppressWarnings({ "deprecation" })
+	@RequestMapping(value = "/add-promotion")
+	public String addPromotion(Model model, HttpServletRequest request,
+			@RequestParam(required = false, name = "page", defaultValue = "1") int page,
+			@RequestParam(required = true, name = "promotionname", defaultValue = "") String promotionName,
+			@RequestParam(required = true, name = "promotionimage", defaultValue = "") String promotionImage,
+			@RequestParam(required = true, name = "promotioncontent", defaultValue = "") String promotionContent,
+			@RequestParam(required = true, name = "promotiondate", defaultValue = "") String promotionDate,
+			@RequestParam(required = true, name = "brandstatus", defaultValue = "1") int promotionStatus) {
+
+		Promotion promotion = new Promotion();
+		String error = "";
+		if (request.getParameter("submit") != null) {
+			try {
+				promotion.setId(Constants.DEUFAULT_ID);
+				promotion.setName(promotionName);
+				promotion.setImage(promotionImage);
+				promotion.setStatus(promotionStatus);
+				promotion.setContent(promotionContent);
+				String dates[] = promotionDate.split("-");
+				if (dates.length > 1) {
+					promotion.setStartAt(new Date(dates[0]));
+					promotion.setEndAt(new Date(dates[1]));
+				}
+				System.out.println(promotion.getEndAt().toString() + "-" + promotion.getStartAt().toString());
+				promotionDAO.insert(promotion);
+				error = "Thêm thành công ưu đãi " + promotion.getName() + "!";
+
+			} catch (Exception e) {
+				System.err.println(e);
+				error = "Có lỗi xảy ra.";
+			}
+			model.addAttribute("error", error);
+		}
+		model.addAttribute("promotion", promotion);
+		return "/admin/add-promotion";
+	}
+
+	@SuppressWarnings("deprecation")
+	@RequestMapping(value = "/edit-promotion/{promotionId}")
+	public String editPromotion(Model model, HttpServletRequest request, @PathVariable("promotionId") int promotionId,
+			@RequestParam(required = true, name = "promotionname", defaultValue = "") String promotionName,
+			@RequestParam(required = true, name = "promotionimage", defaultValue = "") String promotionImage,
+			@RequestParam(required = true, name = "promotioncontent", defaultValue = "") String promotionContent,
+			@RequestParam(required = true, name = "promotiondate", defaultValue = "") String promotionDate,
+			@RequestParam(required = true, name = "promotionstatus", defaultValue = "1") int promotionStatus) {
+		Promotion promotion = promotionDAO.findById(promotionId);
+		String error = "";
+		if (request.getParameter("submit") != null) {
+			if (promotion != null) {
+				promotion.setName(promotionName);
+				promotion.setImage(promotionImage);
+				promotion.setContent(promotionContent);
+				promotion.setStatus(promotionStatus);
+				String dates[] = promotionDate.split("-");
+				if (dates.length > 1) {
+					promotion.setStartAt(new Date(dates[0]));
+					promotion.setEndAt(new Date(dates[1]));
+				}
+				promotionDAO.update(promotion);
+				error = "Cập nhật thành công công hãng " + promotion.getName() + " vào csdl.";
+			} else {
+				error = "Cập nhật thất bại";
+			}
+			model.addAttribute("error", error);
+		}
+		model.addAttribute("promotion", promotion);
+		return "/admin/edit-promotion";
+	}
+
+	/*******************************************************************************************/
+	/*************************************
+	 * POST PAGE
+	 *******************************************/
+	/*******************************************************************************************/
+	@RequestMapping(value = "/posts", method = RequestMethod.GET)
+	public String postList(Model model, @RequestParam(required = false, name = "page", defaultValue = "1") int page) {
 		int totalPage = postDAO.getTotalPage();
-		if (page < 1 || page > totalPage) return "redirect:/admin/403";
-			
+		if (page < 1 || page > totalPage)
+			return "redirect:/admin/403";
+
 		List<Post> postList = postDAO.findAllByPagination(page);
 		ResultPagination<Post> result = new ResultPagination<>(page, totalPage, postList);
-	
+
 		model.addAttribute("result", result);
 		return "/admin/post-list";
 	}
-	
-	@RequestMapping(value="/add-new-post", method=RequestMethod.GET)
-	public String addNewPost(Model model){
+
+	@RequestMapping(value = "/add-new-post", method = RequestMethod.GET)
+	public String addNewPost(Model model) {
 		return "/admin/add-new-post";
 	}
-	
-	@RequestMapping(value="/add-new-post", method=RequestMethod.POST)
-	public String doAddNewPost(
-			Model model,
-			@RequestParam(required=true, name="post_title") String title,
-			@RequestParam(required=true, name="post_description") String description,
-			@RequestParam(required=true, name="post_content") String content,
-			@RequestParam(required=false, name="post_image", defaultValue=Constants.DEFAULT_POST_IMAGE) String image,
-			@RequestParam(required=true, name="post_status", defaultValue=Constants.DEFAULT_POST_STATUS) int status){
-		
+
+	@RequestMapping(value = "/add-new-post", method = RequestMethod.POST)
+	public String doAddNewPost(Model model, @RequestParam(required = true, name = "post_title") String title,
+			@RequestParam(required = true, name = "post_description") String description,
+			@RequestParam(required = true, name = "post_content") String content,
+			@RequestParam(required = false, name = "post_image", defaultValue = Constants.DEFAULT_POST_IMAGE) String image,
+			@RequestParam(required = true, name = "post_status", defaultValue = Constants.DEFAULT_POST_STATUS) int status) {
+
 		Account account = accountDAO.findById(1);
-		
+
 		Post post = new Post();
 		post.setAccount(account);
 		post.setViews(0);
 		post.setPublishDate(new Date());
 		post.setLastEdit(new Date());
-		
-		
+
 		Map<String, String> errors = new HashMap<String, String>();
 
 		// Title
@@ -347,260 +613,252 @@ public class AdminController {
 			String slug = MyUtils.toURLFriendly(title);
 			post.setSlug(slug);
 		}
-		
+
 		// Description
 		if (null == description || description.length() <= 0)
 			errors.put("description", "Mô tả bài viết không được để trống!");
-		else 
+		else
 			post.setDescription(description);
-		
+
 		// Content
 		if (null == content || content.length() <= 0)
 			errors.put("content", "Nội dung bài viết không được bỏ trống!");
-		else 
+		else
 			post.setContent(content);
-		
-		// Image 
+
+		// Image
 		if (null != image && image.length() > 0)
 			post.setImage(image);
-			
+
 		// Status
 		if (status != 0 && status != 1)
 			errors.put("status", "Bạn chưa chọn trạng thái bài viết!");
 		else
 			post.setStatus(status);
-		
 
-		if (errors.isEmpty()){
+		if (errors.isEmpty()) {
 			// add
 			postDAO.add(post);
 			model.addAttribute("result", true);
 		} else
 			model.addAttribute("result", false);
-			model.addAttribute("errors", errors);
-		
+		model.addAttribute("errors", errors);
+
 		model.addAttribute("post", post);
-		
+
 		return "/admin/add-new-post";
 	}
-	
-	
-	@RequestMapping(value="/edit-post/{postId}", method=RequestMethod.GET)
-	public String editPost(
-			Model model,
-			@PathVariable("postId") int postId){
-		
+
+	@RequestMapping(value = "/edit-post/{postId}", method = RequestMethod.GET)
+	public String editPost(Model model, @PathVariable("postId") int postId) {
+
 		Post post = postDAO.findById(postId);
-		if(post == null)
+		if (post == null)
 			return "redirect:/admin/403";
 		else
 			model.addAttribute("post", post);
-		
+
 		return "/admin/edit-post";
 	}
-	
-	@RequestMapping(value="/edit-post/{postId}", method=RequestMethod.POST)
-	public String doEditPost(
-			Model model,
-			@PathVariable("postId") int postId,
-			@RequestParam(required=true, name="post_title") String title,
-			@RequestParam(required=false, name="post_slug") String slug,
-			@RequestParam(required=true, name="post_description") String description,
-			@RequestParam(required=true, name="post_content") String content,
-			@RequestParam(required=false, name="post_image", defaultValue=Constants.DEFAULT_POST_IMAGE) String image,
-			@RequestParam(required=false, name="post_status", defaultValue=Constants.DEFAULT_POST_STATUS) int status){
-		
+
+	@RequestMapping(value = "/edit-post/{postId}", method = RequestMethod.POST)
+	public String doEditPost(Model model, @PathVariable("postId") int postId,
+			@RequestParam(required = true, name = "post_title") String title,
+			@RequestParam(required = false, name = "post_slug") String slug,
+			@RequestParam(required = true, name = "post_description") String description,
+			@RequestParam(required = true, name = "post_content") String content,
+			@RequestParam(required = false, name = "post_image", defaultValue = Constants.DEFAULT_POST_IMAGE) String image,
+			@RequestParam(required = false, name = "post_status", defaultValue = Constants.DEFAULT_POST_STATUS) int status) {
+
 		Post post = postDAO.findById(postId);
-		if(post == null)
+		if (post == null)
 			return "redirect:/admin/403";
-		else{
+		else {
 			Map<String, String> errors = new HashMap<String, String>();
 
 			// Title
 			if (null == title || title.length() <= 0)
 				errors.put("title", "Tiêu đề không được để trống!");
-			else 
+			else
 				post.setTitle(title);
-			
+
 			// Slug
 			if (null == slug || slug.length() <= 0)
 				slug = MyUtils.toURLFriendly(post.getTitle());
 			post.setSlug(slug);
-			
+
 			// Description
 			if (null == description || description.length() <= 0)
 				errors.put("description", "Mô tả bài viết không được để trống!");
-			else 
+			else
 				post.setDescription(description);
-			
+
 			// Content
 			if (null == content || content.length() <= 0)
 				errors.put("content", "Nội dung bài viết không được bỏ trống!");
-			else 
+			else
 				post.setContent(content);
-			
-			// Image 
+
+			// Image
 			if (null != image && image.length() > 0)
 				post.setImage(image);
-				
+
 			// Status
 			if (status != 0 && status != 1)
 				errors.put("status", "Bạn chưa chọn trạng thái bài viết!");
 			else
 				post.setStatus(status);
-			
+
 			// Last Edit
 			post.setLastEdit(new Date());
-			
 
-			if (errors.isEmpty()){
+			if (errors.isEmpty()) {
 				// update
 				postDAO.update(post);
 				model.addAttribute("result", true);
-			} else{
+			} else {
 				model.addAttribute("result", false);
 				model.addAttribute("errors", errors);
 			}
-				
+
 			model.addAttribute("post", post);
 		}
 		return "/admin/edit-post";
 	}
-	
-	
+
 	/*******************************************************************************************/
-	/*********************************** CATEGORY PAGE *****************************************/
+	/***********************************
+	 * CATEGORY PAGE
+	 *****************************************/
 	/*******************************************************************************************/
-	@RequestMapping(value="/categories", method=RequestMethod.GET)
+	@RequestMapping(value = "/categories", method = RequestMethod.GET)
 	public String categoryList(Model model) {
 		List<Category> categoryList = categoryDAO.findAll();
 		model.addAttribute("category_list", categoryList);
 		return "/admin/category-list";
 	}
-	
-	@RequestMapping(value="/add-new-category", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/add-new-category", method = RequestMethod.GET)
 	public String addNewCategory(Model model) {
 		List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
 		model.addAttribute("category_list", categoryList);
 		return "/admin/add-new-category";
 	}
-	
-	@RequestMapping(value="/add-new-category", method=RequestMethod.POST)
-	public String doAddNewCategory(
-			Model model,
-			@RequestParam(name="category_name", required=true) String name,
-			@RequestParam(name="category_slug", required=true) String slug,
-			@RequestParam(name="category_description", required=true) String description,
-			@RequestParam(name="category_parent_id", required=true, defaultValue="0") int parentId, 
-			@RequestParam(name="category_status", required=true) int status,
-			@RequestParam(name="category_image", required=false) String image) {
-		
+
+	@RequestMapping(value = "/add-new-category", method = RequestMethod.POST)
+	public String doAddNewCategory(Model model, @RequestParam(name = "category_name", required = true) String name,
+			@RequestParam(name = "category_slug", required = true) String slug,
+			@RequestParam(name = "category_description", required = true) String description,
+			@RequestParam(name = "category_parent_id", required = true, defaultValue = "0") int parentId,
+			@RequestParam(name = "category_status", required = true) int status,
+			@RequestParam(name = "category_image", required = false) String image) {
+
 		Category category = new Category();
 		Map<String, String> errors = new HashMap<String, String>();
 		if (null == name || name.trim().length() <= 0)
 			errors.put("name", "Tên thể loại không được bỏ trống.");
-		else 
+		else
 			category.setName(name);
-		
+
 		if (null == slug || slug.trim().length() <= 0)
 			errors.put("slug", "Đường dận thể loại không được để trống.");
-		else 
+		else
 			category.setSlug(slug);
-		
+
 		if (null == description || description.trim().length() <= 0)
 			errors.put("description", description);
-		else 
+		else
 			category.setDescription(description);
-		
+
 		if (parentId == 0) {
 			if (null == image || image.trim().length() <= 0)
 				errors.put("image", image);
-			else 
+			else
 				category.setImage(image);
 		} else {
 			Category parentCategory = categoryDAO.findById(parentId);
 			if (parentCategory == null || parentCategory.getParentId() != 0)
 				errors.put("parentId", "út gốc không hợp lệ.");
-			else 
+			else
 				category.setParentId(parentId);
 		}
-		
+
 		if (status != 0 && status != 1)
 			errors.put("status", "Bạn chưa chọn trạng thái cho thể loại.");
-		else 
+		else
 			category.setStatus(status);
-		
+
 		if (errors.isEmpty()) {
 			categoryDAO.add(category);
 			model.addAttribute("result", true);
-		} else 
+		} else
 			model.addAttribute("result", false);
-	
+
 		List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
 		model.addAttribute("category_list", categoryList);
 		model.addAttribute("category", category);
-		
+
 		return "/admin/add-new-category";
 	}
-	
-	@RequestMapping(value="/edit-category/{id}", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/edit-category/{id}", method = RequestMethod.GET)
 	public String editCategory(Model model, @PathVariable("id") int id) {
 		Category category = categoryDAO.findById(id);
-		if (category == null) return "redirect:/admin/403";
+		if (category == null)
+			return "redirect:/admin/403";
 		List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
 		model.addAttribute("category", category);
 		model.addAttribute("category_list", categoryList);
 		return "/admin/edit-category";
 	}
-	
-	@RequestMapping(value="/edit-category/{id}", method=RequestMethod.POST)
-	public String doEditCategory(
-			Model model, 
-			@PathVariable("id") int id,
-			@RequestParam(name="category_name", required=true) String name,
-			@RequestParam(name="category_slug", required=true) String slug,
-			@RequestParam(name="category_description", required=true) String description,
-			@RequestParam(name="category_parent_id", required=true, defaultValue="0") int parentId, 
-			@RequestParam(name="category_status", required=true) int status,
-			@RequestParam(name="category_image", required=false) String image) {
-		
+
+	@RequestMapping(value = "/edit-category/{id}", method = RequestMethod.POST)
+	public String doEditCategory(Model model, @PathVariable("id") int id,
+			@RequestParam(name = "category_name", required = true) String name,
+			@RequestParam(name = "category_slug", required = true) String slug,
+			@RequestParam(name = "category_description", required = true) String description,
+			@RequestParam(name = "category_parent_id", required = true, defaultValue = "0") int parentId,
+			@RequestParam(name = "category_status", required = true) int status,
+			@RequestParam(name = "category_image", required = false) String image) {
+
 		Category category = categoryDAO.findById(id);
-		if (null == category) return "redirect/admin/403"; 
+		if (null == category)
+			return "redirect/admin/403";
 		else {
 			Map<String, String> errors = new HashMap<String, String>();
 			if (null == name || name.trim().length() <= 0)
 				errors.put("name", "Tên thể loại không được bỏ trống.");
-			else 
+			else
 				category.setName(name);
-			
+
 			if (null == slug || slug.trim().length() <= 0)
 				errors.put("slug", "Đường dận thể loại không được để trống.");
-			else 
+			else
 				category.setSlug(slug);
-			
+
 			if (null == description || description.trim().length() <= 0)
 				errors.put("description", description);
-			else 
+			else
 				category.setDescription(description);
-			
+
 			if (parentId == 0) {
 				if (null == image || image.trim().length() <= 0)
 					errors.put("image", image);
-				else 
+				else
 					category.setImage(image);
 			} else {
 				Category parentCategory = categoryDAO.findById(parentId);
 				if (parentCategory == null || parentCategory.getParentId() != 0)
 					errors.put("parentId", "út gốc không hợp lệ.");
-				else 
+				else
 					category.setParentId(parentId);
 			}
-			
+
 			if (status != 0 && status != 1)
 				errors.put("status", "Bạn chưa chọn trạng thái cho thể loại.");
-			else 
+			else
 				category.setStatus(status);
-			
+
 			if (errors.isEmpty()) {
 				categoryDAO.update(category);
 				model.addAttribute("result", true);
@@ -608,8 +866,7 @@ public class AdminController {
 				model.addAttribute("result", false);
 				model.addAttribute("errors", errors);
 			}
-				
-		
+
 			List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
 			model.addAttribute("category_list", categoryList);
 			model.addAttribute("category", category);
@@ -617,25 +874,99 @@ public class AdminController {
 		}
 		return "/admin/edit-category";
 	}
-	
-	
-	
+
 	/*******************************************************************************************/
-	/************************************ ACCOUNT PAGE *****************************************/
+	/************************************
+	 * ACCOUNT PAGE
+	 *****************************************/
 	/*******************************************************************************************/
-	
-	@RequestMapping(value="/members", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/members", method = RequestMethod.GET)
 	public String accountList(Model model) {
 		List<Account> accountList = accountDAO.findAll();
 		model.addAttribute("account_list", accountList);
 		return "/admin/member-list";
 	}
-	
-	@RequestMapping(value="/profile/{id}", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/profile/{id}", method = RequestMethod.GET)
 	public String accountProfile(Model model, @PathVariable("id") int id) {
 		Account account = accountDAO.findById(id);
-		if (account == null) return "redirect:/admin/403";
-		else model.addAttribute("account", account);
+		if (account == null)
+			return "redirect:/admin/403";
+		else
+			model.addAttribute("account", account);
 		return "/admin/profile";
 	}
+
+	@RequestMapping(value = "/profile/{id}", method = RequestMethod.POST)
+	public String updateAccountProfile(Model model, @PathVariable("id") int id,
+			@RequestParam(required = true, name = "account_first_name") String firstName,
+			@RequestParam(required = true, name = "account_last_name") String lastName,
+			@RequestParam(required = true, name = "account_email") String email,
+			@RequestParam(required = true, name = "account_phone") String phone,
+			@RequestParam(required = true, name = "account_address") String address,
+			@RequestParam(required = true, name = "account_biography") String biography,
+			@RequestParam(required = true, name = "account_gender", defaultValue = "0") int gender) {
+
+		Account account = accountDAO.findById(id);
+		if (account == null)
+			// model.addAttribute("result", false);
+			return "redirect:/admin/403";
+		else {
+			account.setFirstName(firstName);
+			account.setLastName(lastName);
+			account.getAccountProfile().setEmail(email);
+			account.getAccountProfile().setPhone(phone);
+			account.getAccountProfile().setAddress(address);
+			account.getAccountProfile().setBiography(biography);
+			account.getAccountProfile().setGender(gender == 0 ? false : true);
+			accountDAO.update(account);
+			model.addAttribute("account", account);
+			model.addAttribute("result", true);
+		}
+
+		return "/admin/profile";
+	}
+
+	@RequestMapping(value = "/profile/{id}/reset-password", method = RequestMethod.POST)
+	public String resetPassword(Model model, @PathVariable("id") int id,
+			@RequestParam(required = true, name = "current_password") String currentPassword,
+			@RequestParam(required = true, name = "new_password") String newPassword,
+			@RequestParam(required = true, name = "confirm_password") String confirmPassword) {
+		Account account = accountDAO.findById(id);
+		if (account == null) {
+			return "/admin/403";
+		} else {
+			Map<String, String> errors_password = new HashMap<String, String>();
+			if (currentPassword == null || currentPassword.length() <= 0)
+				errors_password.put("current_password", "Mật khẩu không được bỏ trống!");
+			if (newPassword == null || newPassword.length() <= 0)
+				errors_password.put("new_password", "Mật khẩu mới không được bỏ trống!");
+			if (confirmPassword == null || confirmPassword.length() <= 0)
+				errors_password.put("confirm_password", "Xác nhận mật khẩu không được bỏ trống!");
+
+			String passwordHash = MD5Hash.MD5Encrypt(currentPassword + account.getSalt());
+			if (!passwordHash.equals(account.getPasswordHash())) {
+				errors_password.put("current_password", "Mật khẩu không chính xác!");
+			} else if (!newPassword.equals(confirmPassword)) {
+				errors_password.put("confirm_password", "Xác nhận mật khẩu không chính xác!");
+			}
+
+			if (!errors_password.isEmpty()) {
+				model.addAttribute("result_reset_password", false);
+			} else {
+				String newSalt = MD5Hash.getSalt();
+				String hashPassword = MD5Hash.MD5Encrypt(newPassword + newSalt);
+				account.setSalt(newSalt);
+				account.setPasswordHash(hashPassword);
+
+				accountDAO.update(account);
+				model.addAttribute("result_reset_password", true);
+			}
+
+			model.addAttribute("account", account);
+		}
+		return "/admin/profile";
+	}
+
 }

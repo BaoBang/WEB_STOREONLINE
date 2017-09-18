@@ -39,7 +39,7 @@ public class Promotion implements Serializable {
 	private int status;
 
 	//bi-directional many-to-many association to Product
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(
 		name="product_promotions"
 		, joinColumns={

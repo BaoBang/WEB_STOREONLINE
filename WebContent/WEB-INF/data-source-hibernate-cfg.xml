@@ -8,7 +8,7 @@
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url" value="jdbc:mysql://localhost:3306/ptit_shop?useUnicode=true&amp;characterEncoding=UTF-8" />
 		<property name="username" value="root" />
-		<property name="password" value="" />
+		<property name="password" value="123456" />
 	</bean>
 
 	<bean id="mySessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">

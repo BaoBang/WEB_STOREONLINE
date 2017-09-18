@@ -64,7 +64,7 @@
                 </li>
               </ul>
 
-              <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
+              <a href="#" class="btn btn-primary btn-block"><b>Profile</b></a>
             </div>
             <!-- /.box-body -->
           </div>
@@ -76,42 +76,42 @@
 		<div class="col-md-9">
 		  <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#infomation" data-toggle="tab">Infomation</a></li>
-              <li><a href="#reset-password" data-toggle="tab">Security</a></li>
+              <li class="${empty result_reset_password ? 'active':''}"><a href="#infomation" data-toggle="tab">Infomation</a></li>
+              <li class="${not empty result_reset_password ? 'active':''}"><a href="#reset-password" data-toggle="tab">Security</a></li>
             </ul>
             <div class="tab-content">
-              <div class="active tab-pane" id="infomation">
-				<form class="form-horizontal">
+              <div class="tab-pane${empty result_reset_password ? ' active':''}" id="infomation">
+				<form class="form-horizontal" action="${pageContext.request.contextPath}/admin/profile/${account.id}" method="post">
                   <div class="form-group">
                     <label for="inputFirstName" class="col-sm-2 control-label">First Name</label>
                     <div class="col-sm-4">
-                      <input type="email" class="form-control" id="inputFirstName" placeholder="First name">
+                      <input type="text" class="form-control" id="inputFirstName" name="account_first_name" value="${account.firstName}" placeholder="First name">
                     </div>
                     
                     <label for="inputLastName" class="col-sm-2 control-label">Last Name</label>
                     <div class="col-sm-4">
-                      <input type="email" class="form-control" id="inputLastName" placeholder="Last name">
+                      <input type="text" class="form-control" id="inputLastName" name="account_last_name" value="${account.lastName}" placeholder="Last name">
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="inputEmail" class="col-sm-2 control-label">Email</label>
 
                     <div class="col-sm-10">
-                      <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                      <input type="email" class="form-control" id="inputEmail" name="account_email" value="${account.accountProfile.email}" placeholder="Email">
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="inputPhone" class="col-sm-2 control-label">Phone</label>
 
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputPhone" placeholder="Phone">
+                      <input type="text" class="form-control" id="inputPhone" name="account_phone" value="${account.accountProfile.phone}" placeholder="Phone">
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="inputAddress" class="col-sm-2 control-label">Address</label>
 
                     <div class="col-sm-10">
-                      <textarea class="form-control" id="inputAddress" placeholder="Address"></textarea>
+                      <textarea class="form-control" id="inputAddress" name="account_address" placeholder="Address">${account.accountProfile.address}</textarea>
                     </div>
                   </div>
                   
@@ -119,7 +119,7 @@
                     <label for="inputBiography" class="col-sm-2 control-label">Biography</label>
 
                     <div class="col-sm-10">
-                      <textarea class="form-control" id="inputBiography" placeholder="Biography"></textarea>
+                      <textarea class="form-control" id="inputBiography" name="account_biography" placeholder="Biography">${account.accountProfile.biography}</textarea>
                     </div>
                   </div>
                   
@@ -131,7 +131,7 @@
 	                 <!-- radio -->
 	                  <div class="radio">
 	                    <label>
-	                      <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+	                      <input type="radio" name="account_gender" id="optionsMen" value="1" ${account.accountProfile.gender ? 'checked':''}>
 	                      Men
 	                    </label>
 	                  </div>
@@ -141,7 +141,7 @@
 	                 <!-- radio -->
 	                  <div class="radio">
 	                    <label>
-	                      <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+	                      <input type="radio" name="account_gender" id="optionsWomen" value="0" ${account.accountProfile.gender eq false ? 'checked':''}>
 	                      Women
 	                    </label>
 	                  </div>
@@ -150,53 +150,80 @@
                     <div class="col-sm-6"></div>
               </div>
                   
-                 <!--  <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                      <div class="checkbox">
-                        <label>
-                          <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
-                        </label>
-                      </div>
-                    </div>
-                  </div> -->
-                  
                   <hr/>
                   
                   <div class="form-group">
+	                  <div class="col-md-12">
+				        <c:if test="${result}">
+					        <div class="alert alert-success alert-dismissible">
+					        	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					        	<h4><i class="icon fa fa-check"></i> Thành công!</h4> Cập nhật thông tin tài khoản <strong>${account.getFullName()}</strong> thành công.
+					        </div>
+				         </c:if>
+				         <c:if test="${result eq false}">
+					        <div class="alert alert-warning alert-dismissible">
+				                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+				                <h4><i class="icon fa fa-warning"></i> Thất bại!</h4> Cập nhật thông tin tài khoản <strong>${account.getFullName()}</strong> thất bại.
+				              </div>
+				         </c:if>
+				       </div>
+			       </div>
+			                  
+                  <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                      <button type="submit" class="btn btn-danger">Submit</button>
+                      <button type="submit" class="btn btn-danger">SAVE</button>
                     </div>
                   </div>
                 </form>
               </div>
               <!-- /.tab-pane -->
               
-              <div class="tab-pane" id="reset-password">
-                <form class="form-horizontal">
+              <div class="tab-pane${not empty result_reset_password ? ' active':''}" id="reset-password">
+                <form class="form-horizontal" action="${pageContext.request.contextPath}/admin/profile/${account.id}/reset-password" method="post">
+                  <div class="form-group">
+	                  <div class="col-md-12">
+				        <c:if test="${result_reset_password}">
+					        <div class="alert alert-success alert-dismissible">
+					        	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					        	<h4><i class="icon fa fa-check"></i> Thành công!</h4> Cập nhật thông tin tài khoản <strong>${account.getFullName()}</strong> thành công.
+					        </div>
+				         </c:if>
+				         <c:if test="${result_reset_password eq false}">
+					        <div class="alert alert-warning alert-dismissible">
+				                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+				                <h4><i class="icon fa fa-warning"></i> Thất bại!</h4> Cập nhật thông tin tài khoản <strong>${account.getFullName()}</strong> thất bại.
+				              </div>
+				         </c:if>
+				       </div>
+			       </div>
+                  
                   <div class="form-group">
                     <label for="inputNewPassword" class="col-sm-3 control-label">Current password</label>
 
                     <div class="col-sm-9">
-                      <input type="password" class="form-control" id="inputNewPassword" placeholder="Current password ...">
+                      <input type="password" class="form-control" id="inputNewPassword" name="current_password" placeholder="Current password ...">
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="inputNewPassword" class="col-sm-3 control-label">New Password</label>
 
                     <div class="col-sm-9">
-                      <input type="password" class="form-control" id="inputNewPassword" placeholder="New password ...">
+                      <input type="password" class="form-control" id="inputNewPassword" name="new_password" placeholder="New password ...">
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="inputComfirmPassword" class="col-sm-3 control-label">Comfirm password</label>
 
                     <div class="col-sm-9">
-                      <input type="text" class="form-control" id="inputComfirmPassword" placeholder="Comfirm password ...">
+                      <input type="password" class="form-control" id="inputComfirmPassword" name="confirm_password" placeholder="Comfirm password ...">
                     </div>
                   </div>
+                  
+                  <hr>
+                  
                   <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                      <button type="submit" class="btn btn-danger">Submit</button>
+                      <button type="submit" class="btn btn-danger">SAVE</button>
                     </div>
                   </div>
                 </form>

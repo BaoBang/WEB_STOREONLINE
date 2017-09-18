@@ -48,7 +48,6 @@ public class UploadFileWithAjaxController {
 		@RequestMapping(value = "/one-file", method = RequestMethod.POST)
 		public String uploadOneFileHandlerPOST(HttpServletRequest request, Model model,
 				@RequestParam(name="file", required=true) CommonsMultipartFile file) {
-			
 			return doUpload(request, model, file);
 		}
 		

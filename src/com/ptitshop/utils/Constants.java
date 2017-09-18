@@ -34,7 +34,7 @@ public class Constants {
 	public static final int DEUFAULT_ID = 0;
 	public static final String DEFAULT_ROLE = "ROLE_USER";
 	public static final String DEFAULT_AVATAR = "/PTiTShop/themes/images/avatar-75.png";
-	public static final int DEFAULT_GENDER = 1;
+	public static final boolean DEFAULT_GENDER = true;
 	public static final int DEFAULT_STATUS = 1;
 	public static final int ZERO_NUMBER = 0;
 	/*
@@ -49,6 +49,6 @@ public class Constants {
 
 	public static final String NAME_REGULAR = "^[a-zA-Z]{1,}$";
 
-	public static final String DEFAULT_POST_IMAGE = "images/default_post_image.png";
+	public static final String DEFAULT_POST_IMAGE = "/themes/images/default_post_image.png";
 	public static final String DEFAULT_POST_STATUS = "1";
 }

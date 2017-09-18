@@ -131,7 +131,7 @@ public class ProductDAOImpl implements ProductDAO {
 		try {
 			Session sesion = sessionFactory.openSession();
 			sesion.beginTransaction();
-			sesion.saveOrUpdate(product);
+			sesion.save(product);
 			sesion.getTransaction().commit();
 			return true;
 		} catch (Exception e) {
@@ -144,7 +144,7 @@ public class ProductDAOImpl implements ProductDAO {
 		try {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
-			session.saveOrUpdate(product);
+			session.update(product);
 			session.getTransaction().commit();
 			return true;
 		} catch (Exception e) {
@@ -164,5 +164,30 @@ public class ProductDAOImpl implements ProductDAO {
 			return false;
 		}
 	}
+
+	@Override
+	public void merge(Product product) {
+		Session session = sessionFactory.getCurrentSession();
+		//session.saveOrUpdate(product);
+		session.merge(product);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Product> searchByName(String name) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Product> query = session.createQuery("select p from Product p where p.name like :name");
+		query.setParameter("name", "%" + name +  "%");
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Product> findAll() {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Product> query = session.createQuery("select p from Product p");
+		return query.getResultList();
+	}
+
 
 }

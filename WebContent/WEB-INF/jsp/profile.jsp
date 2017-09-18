@@ -91,12 +91,12 @@
 											<label>Giới tính:</label> <label class="radio-inline"
 												for="gender"> <input id="male" name="gender"
 												type="radio" value="1" class="edit" disabled="disabled"
-												<c:if test="${user.accountProfile.gender == 1.0}">checked='checked'</c:if>>
+												<c:if test="${user.accountProfile.gender}">checked='checked'</c:if>>
 												Nam
 											</label> <label class="radio-inline"> <input name="gender"
 												id="female" type="radio" value="0" class="edit"
 												disabled="disabled"
-												<c:if test="${user.accountProfile.gender == 0.0}" >checked='checked'</c:if>>Nữ
+												<c:if test="${user.accountProfile.gender eq false}" >checked='checked'</c:if>>Nữ
 											</label>
 										</div>
 										<div class="form-group">

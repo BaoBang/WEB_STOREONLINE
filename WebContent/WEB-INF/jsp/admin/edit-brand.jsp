@@ -45,18 +45,18 @@
 						<!-- form start -->
 						<form role="form"
 							action="${pageContext.request.contextPath }/admin/edit-brand/${brand.id}"
-							method="get" enctype="multipart/form-data">
+							method="post" enctype="multipart/form-data">
 							<div class="box-body">
 								<div class="form-group">
 									<label>Hãng sản xuất:</label> <input type="text"
 										name="brandname" required value="${brand.name }"
 										class="form-control" placeholder="Nhập vào tên hãng"/>
 								</div>
-								<div class="form-group">
+								<div id="form-upload" class="form-group">
 									<label>Hình:</label>
-									<input type="text" name="brandimage" readonly="readonly" class="form-control" value="${brand.image }"/>
+									<input type="text" class="form-control" id="brandImage" name="brandimage" value="${brand.image }" placeholder="Hình..." readonly="readonly">
 									<input class="form-control" type="file"
-										name="files[]" required>
+										name="files[]">
 										<button type="button" id="btn-upload" class="btn btn-primary">
 										<i class="fa fa-cloud-upload"></i> Upload
 									</button>
@@ -65,12 +65,12 @@
 									<label>Trạng thái:</label>
 									<div class="radio">
 										<label>
-											<input name="brandstatus" type="radio" value="1" ${brand.status eq '1' ? 'checked' : '' } >Hiện
+											<input name="brandstatus" type="radio" value="1" ${brand.status eq '1' ? 'checked' : '' } ><span class="badge bg-green">Hiện</span>
 										</label>
 									</div>
 									<div class="radio">
 										<label> 
-											<input name="brandstatus" type="radio" value="0" ${brand.status eq '0' ? 'checked' : '' }>Ẩn
+											<input name="brandstatus" type="radio" value="0" ${brand.status eq '0' ? 'checked' : '' }><span class="badge bg-yellơ">Ẩn</span>
 										</label>
 									</div>
 								</div>
@@ -100,5 +100,40 @@
 
 
 	<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+	<script type="text/javascript">
+$(document).ready(function(){
+	var files = [];
+	$(document).on( "change","#form-upload",function(event) {
+       files=event.target.files;
+     });
+
+	$(document) .on( "click","#btn-upload",function() {
+       processUpload();
+    });
+	
+	function processUpload() {
+        var oMyForm = new FormData();
+        oMyForm.append("file", files[0]);
+       	$.ajax({dataType : 'json',
+              url : "${pageContext.request.contextPath}/ajax/upload/one-file",
+              data : oMyForm,
+              type : "POST",
+              enctype: 'multipart/form-data',
+              processData: false, 
+              contentType:false,
+              dataType:"text",
+              success: function(result) {
+            	  console.log("SUCCESS: ", result);
+            	  $('#brandImage').val(result);
+                  /* alert(result); */
+              },
+	          error : function(e) {
+	              console.log("ERROR: ", e);
+	          }
+          });
+    }
+});
+
+</script>
 </body>
 </html>

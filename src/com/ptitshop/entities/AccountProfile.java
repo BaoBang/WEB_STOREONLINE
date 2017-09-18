@@ -26,7 +26,7 @@ public class AccountProfile implements Serializable {
 
 	private String email;
 
-	private double gender;
+	private boolean gender;
 
 	private String phone;
 
@@ -69,11 +69,11 @@ public class AccountProfile implements Serializable {
 		this.email = email;
 	}
 
-	public double getGender() {
+	public boolean getGender() {
 		return this.gender;
 	}
 
-	public void setGender(double gender) {
+	public void setGender(boolean gender) {
 		this.gender = gender;
 	}
 

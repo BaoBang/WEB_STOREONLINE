@@ -13,8 +13,12 @@ public interface ProductDAO {
 	public List<Product> getTopProductByCategoryId(int categotyId, int status);
 	public List<Product> findAllByPagination(int page);
 	public int getTotalPage();
-	
+	public List<Product> findAll();
 	public boolean insert(Product product);
 	public boolean update(Product product);
 	public boolean remove(Product product);
+	public List<Product> searchByName(String name);
+	
+	public void merge(Product product);
+	
 }

@@ -39,3 +39,32 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/themes/js/owl.carousel.min.js"></script>
 <!-- Shop -->
 <script type="text/javascript" src="${pageContext.request.contextPath}/themes/js/shop.js"></script>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		//var x_timer;
+		$("#input-search").on('keyup',function(e) {
+			
+		//	clearTimeout(x_timer);
+			var input_data = $(this).val();
+			search(input_data);
+			
+		});
+		function search(input_data) {
+			$.ajax({type : "GET",
+						url : "${pageContext.request.contextPath}/ajax/search",
+						data : {
+							inputdata : input_data
+						},
+						success : function(result) {
+							
+							$('#search-result-main').html(result);
+							
+						}
+					});
+
+		}
+	});
+
+</script>

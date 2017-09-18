@@ -39,7 +39,7 @@ public class ProductDetailDAOImpl implements ProductDetailDAO {
 		try {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
-			session.delete(detail);
+			session.update(detail);
 			session.getTransaction().commit();
 			return true;
 		} catch (Exception e) {
@@ -49,7 +49,14 @@ public class ProductDetailDAOImpl implements ProductDetailDAO {
 
 	@Override
 	public boolean remove(ProductDetail detail) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			Session sesion = sessionFactory.openSession();
+			sesion.beginTransaction();
+			sesion.delete(detail);
+			sesion.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

@@ -9,7 +9,6 @@
   </footer>
 
 <!-- ./wrapper -->
-
 <!-- jQuery 2.2.0 -->
 <script src="${pageContext.request.contextPath}/themes/admin/plugins/jQuery/jQuery-2.2.0.min.js"></script>
 <!-- Bootstrap 3.3.6 -->

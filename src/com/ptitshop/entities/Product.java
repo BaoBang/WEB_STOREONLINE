@@ -67,7 +67,7 @@ public class Product implements Serializable {
 	private ProductDetail productDetail;
 
 	//bi-directional many-to-many association to Promotion
-	@ManyToMany(mappedBy="products", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy="products", fetch = FetchType.EAGER)
 	private List<Promotion> promotions;
 
 	public Product() {

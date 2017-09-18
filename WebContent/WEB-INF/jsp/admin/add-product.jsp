@@ -37,11 +37,11 @@
 					<!-- general form elements -->
 					<div class="box box-primary ">
 						<div class="box-header with-border">
-							<h3 class="box-title title-name">THÊM HÃNG SẢN XUẤT</h3>
+							<h3 class="box-title title-name">THÊM SẢN PHẨM</h3>
 						</div>
 						<!-- /.box-header -->
 						<!-- form start -->
-						<form role="form" action="" method="get"
+						<form role="form" action="" method="post"
 							enctype="multipart/form-data">
 							<div class="box-body">
 								<div class="form-group">
@@ -50,10 +50,14 @@
 										name="productname" placeholder="Nhập vào tên sản phẩm"
 										value="" required>
 								</div>
-								<div class="form-group">
-									<label class="control-label col-md-4 col-lg-4">Hình</label> <input
-										type="file" name="files" required>
-
+								<div id="form-upload" class="form-group">
+									<label class="control-label col-md-4 col-lg-4">Hình</label>
+									<textarea type="text" class="form-control" id="productImage"
+										name="productimage" placeholder="Hình..." readonly="readonly" rows="5"></textarea>
+									<input type="file" name="files" required>
+									<button type="button" id="btn-upload" class="btn btn-primary">
+										<i class="fa fa-cloud-upload"></i> Upload
+									</button>
 								</div>
 								<div class="form-group">
 									<label for="exampleInputPassword1">Loại sản phẩm</label> <select
@@ -116,6 +120,19 @@
 											<option style="padding: 5px 0px;" value="${promotion.id }">${promotion.name }</option>
 										</c:forEach>
 									</select>
+								</div>
+								<div class="form-group">
+									<label>Trạng thái:</label>
+									<div class="radio">
+										<label>
+											<input name="productstatus" type="radio" value="1" checked ><span class="badge bg-green">Hiện</span>
+										</label>
+									</div>
+									<div class="radio">
+										<label> 
+											<input name="productstatus" type="radio" value="0"><span class="badge bg-yellow">Ẩn</span>
+										</label>
+									</div>
 								</div>
 							</div>
 							<!-- /.box-body -->
@@ -267,6 +284,47 @@
 					[ 'Syntaxhighlight' ] ]
 		});
 	</script>
+	<script type="text/javascript">
+$(document).ready(function(){
+	var files = [];
+	$(document).on( "change","#form-upload",function(event) {
+       files=event.target.files;
+     });
+
+	$(document) .on( "click","#btn-upload",function() {
+       processUpload();
+    });
+	
+	function processUpload() {
+        var oMyForm = new FormData();
+        var imagePaths ="";
+        for(var i = 0; i < files.length; i++){
+        	oMyForm.append("file", files[i]);
+        	$.ajax({dataType : 'json',
+                url : "${pageContext.request.contextPath}/ajax/upload/one-file",
+                data : oMyForm,
+                type : "POST",
+                enctype: 'multipart/form-data',
+                processData: false, 
+                contentType:false,
+                dataType:"text",
+                success: function(result) {
+              	  console.log("SUCCESS: ", result);
+              	
+              	  imagePaths += result + "\n";
+              	  $('#productImage').val(imagePaths);
+                    /* alert(result); */
+                },
+  	          error : function(e) {
+  	              console.log("ERROR: ", e);
+  	          }
+            });
+        }
+       
+    }
+});
+
+</script>
 </body>
 
 </html>
