@@ -1,19 +1,21 @@
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>${post.title} | Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
+<title>Bài viết: ${post.title} | PTiTShop AdminCP</title>
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
 
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+<c:set var="current_page_parent" value="page_post"/>
+<c:set var="current_page" value="page_post_list"/>
 <div class="wrapper">
 
-<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-  
-<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 
 
  <!-- Content Wrapper. Contains page content -->
@@ -21,14 +23,10 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Data Tables
-        <small>advanced tables</small>
+        ${post.title}
+        <small>Bài viết</small>
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Tables</a></li>
-        <li class="active">Data tables</li>
-      </ol>
+     
     </section>
 
 	
@@ -57,23 +55,23 @@
           <div class="box box-primary">
               <form role="form" action="${pageContext.request.contextPath}/admin/edit-post/${post.id}" method="post">
             <div class="box-header with-border">
-              <h3 class="box-title">Add new post</h3>
+              <h3 class="box-title">Cập nhật thông tin bài viết</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
 
                 <!-- text input -->
                 <div class="form-group${((not empty errors) and (not empty errors.title)) ? ' has-warning':''}">
-                  <label>Title</label>
-                  <input type="text" name="post_title" value="${post.title}" class="input-lg form-control${((not empty errors) and (not empty errors.title)) ? ' form-control-warning':''}" placeholder="Enter title ..." required>
+                  <label>Tiêu đề</label>
+                  <input type="text" name="post_title" value="${post.title}" class="input-lg form-control${((not empty errors) and (not empty errors.title)) ? ' form-control-warning':''}" placeholder="Nhập tiêu đề" required>
                   <c:if test="${(not empty errors) and (not empty errors.title)}">
               	  <small class="form-text text-warning">${errors.title}</small>
                   </c:if>
                 </div>
                 
                 <div class="form-group${((not empty errors) and (not empty errors.slug)) ? ' has-warning':''}">
-                  <label>Slug</label>
-                  <input type="text" class="form-control${((not empty errors) and (not empty errors.slug)) ? ' form-control-warning':''}" name="post_slug" value="${post.slug}" placeholder="Enter slug ..." >
+                  <label>Đường dẫn</label>
+                  <input type="text" class="form-control${((not empty errors) and (not empty errors.slug)) ? ' form-control-warning':''}" name="post_slug" value="${post.slug}" placeholder="Nhập đường dẫn" >
                   <c:if test="${(not empty errors) and (not empty errors.slug)}">
                   <small class="form-text text-warning">${errors.slug}</small>
                   </c:if>
@@ -81,16 +79,16 @@
 
                 <!-- textarea -->
                 <div class="form-group${((not empty errors) and (not empty errors.description)) ? ' has-warning':''}">
-                  <label>Description</label>
-                  <textarea class="form-control${((not empty errors) and (not empty errors.description)) ? ' form-control-warning':''}" rows="3" name="post_description" placeholder="Enter description ..." required>${post.description}</textarea>
+                  <label>Mô tả</label>
+                  <textarea class="form-control${((not empty errors) and (not empty errors.description)) ? ' form-control-warning':''}" rows="3" name="post_description" placeholder="Nhập mô tả" required>${post.description}</textarea>
                   <c:if test="${(not empty errors) and (not empty errors.description)}">
 	              <small class="form-text text-warning">${errors.description}</small>
 	              </c:if>
                 </div>
                 
                 <div class="form-group${((not empty errors) and (not empty errors.content)) ? ' has-warning':''}">
-                  <label>Content</label>
-                  <textarea id="textAreaCKEditor" class="form-control${((not empty errors) and (not empty errors.content)) ? ' form-control-warning':''}" rows="10" name="post_content" placeholder="Enter content ..." required>${post.content}</textarea>
+                  <label>Nội dung</label>
+                  <textarea id="textAreaCKEditor" class="form-control${((not empty errors) and (not empty errors.content)) ? ' form-control-warning':''}" rows="10" name="post_content" placeholder="Nhập nội dung" required>${post.content}</textarea>
                   <c:if test="${(not empty errors) and (not empty errors.content)}">
                   <small class="form-text text-warning">${errors.content}</small>
                   </c:if>
@@ -98,8 +96,8 @@
 
                 <div id="form-upload" class="form-group">
                   <label for="file-data">File input</label>
-                  <input type="text" class="form-control" id="postImage" name="post_image" value="${post.image}" placeholder="Image...">
-                  <input type="file" id="file-data" class="form-control-file" name="files[]" aria-describedby="fileHelp" required>
+                  <input type="text" class="form-control" id="postImage" name="post_image" value="${post.image}" placeholder="Hình ảnh" required>
+                  <input type="file" id="file-data" class="form-control-file" name="files[]" aria-describedby="fileHelp">
                   <button type="button" id="btn-upload" class="btn btn-primary"><i class="fa fa-cloud-upload" ></i> Upload</button>
                   <!-- <p class="help-block">Example block-level help text here.</p> -->
                   <!-- <i class="fa fa-spinner fa-pulse fa-fw"></i> -->
@@ -107,18 +105,18 @@
 
                 <!-- radio -->
                 <div class="form-group">
-                  <label>Status</label>
+                  <label>Trạng thái</label>
                   
                   <div class="radio">
                     <label>
                       <input type="radio" name="post_status" value="1" ${post.status eq 1 ? 'checked':''}>
-                      Publish
+                      <span class="badge bg-green">Công khai</span>
                     </label>
                   </div>
                   <div class="radio">
                     <label>
                       <input type="radio" name="post_status" value="0" ${post.status eq 0 ? 'checked':''}>
-                      Hidden
+                      <span class="badge bg-yellow">Ẩn</span>
                     </label>
                   </div>
                   <c:if test="${(not empty errors) and (not empty errors.status)}">
@@ -130,7 +128,7 @@
             </div>
             <!-- /.box-body -->
 			  <div class="box-footer text-center">
-	            <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-floppy-o""></i> SAVE</button>
+	            <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-floppy-o""></i> Lưu</button>
 	          </div>
            </form>
           </div>
@@ -149,7 +147,7 @@
   <!-- /.content-wrapper -->
 	
 
-<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 <script src="${pageContext.request.contextPath}/themes/plugins/ckeditor/ckeditor.js"></script>
 <script>
 	CKEDITOR.replace( 'textAreaCKEditor' ,{

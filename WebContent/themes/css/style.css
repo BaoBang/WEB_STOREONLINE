@@ -144,7 +144,7 @@ li.nav-item-cat {
 }
 
 li.nav-item-cat a.nav-link {
-	font-size: 15px;
+	font-size: 0.9rem;
 	color: #333333;
 }
 
@@ -223,7 +223,7 @@ li.dropdown:hover .dropdown-cat{
 	padding: 20px;
 	border-radius: 0;
 	border: 1px solid #EEEEEE;
-	right: 180px;
+	right: 205px;
 	top: 41px;
 	-webkit-box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2), 0px 6px 20px 0px rgba(0, 0, 0, 0.19);
 	-moz-box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2), 0px 6px 20px 0px rgba(0, 0, 0, 0.19);
@@ -677,7 +677,7 @@ div.product-list div.product-box div.product div.product-img img {width: 99%;}
 
 div.product-list div.product-box div.product p.info {
 	margin: 0px;
-	width: auto;
+	width: 100%;
 	height: 67%;
 	background-color: rgba(0,0,0, 0.6);
 }
@@ -1262,19 +1262,23 @@ td.btn-remove{
 	width: 250px;
 	height: 250px;
 	border-radius: 50%;
-	
+	margin: 0 auto;
 }
 .edit{
 	
 }
-#btnUpdate{
+.btnUpdate{
 	color: #000;
 	font-size: 14px;	
 }
-#btnUpdate:hover{
+.btnUpdate:hover{
 	color: red;
 	cursor: pointer;
 	
+}
+.form-control.required.edit-pass{
+	width: 95%;
+	display: inline;	
 }
 /***********************SEARCH RESULT*********************************************/
 #search-result>div>ul {
@@ -1288,8 +1292,13 @@ div#search-result {
     z-index: 9999;
     top: 39px;
     background-color: #fff;
-    
+	
+	-webkit-box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.3), 0px 6px 20px 0px rgba(0, 0, 0, 0.19);
+	-moz-box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.3), 0px 6px 20px 0px rgba(0, 0, 0, 0.19);
+	box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.3), 0px 6px 20px 0px rgba(0, 0, 0, 0.19);
 }
+
+
 .search-result-main>div>h4{
 	font-size: 12px;
 	font-weight: 500;
@@ -1300,14 +1309,16 @@ div#search-result {
 	vertical-align: middle;
 	padding:10px;
 }
-.search-result-main>div>a{
+.link{
 	font-size: 14px;
 	padding: 5px 0px;
 	color: #000;
-	text-decoration: underline;
-}
-.search-result-main>div>a:hover{
 	text-decoration: none;
+}
+.link:hover h3{
+	color: #df2626;
+}
+.link:hover{
 	color: #df2626;
 	cursor: pointer;
 }
@@ -1348,6 +1359,7 @@ div#search-result {
     font-size: 14px;
     font-weight: bold;
     color: #d0021b;
+    padding-left: 20%;
 }
 
 form.form-inline.form-search>input {
@@ -1357,7 +1369,6 @@ form.form-inline.form-search>input {
 form.form-inline.form-search>button {
     display: inline-block;
     position: absolute;
-    top: 1px;
     right: 0;
 }
 

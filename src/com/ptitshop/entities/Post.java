@@ -12,11 +12,13 @@ import java.util.Date;
 @Entity
 @Table(name="posts")
 @NamedQueries({
-	@NamedQuery(name="Post.findAll", query="SELECT p FROM Post p"),
+	@NamedQuery(name="Post.findAll", query="SELECT p FROM Post p ORDER BY p.publishDate DESC"),
 	@NamedQuery(name="Post.getTotalPage", query="SELECT COUNT(p) FROM Post p"),
 	@NamedQuery(name="Post.findBySlug", query="SELECT p FROM Post p WHERE p.slug=:slug"),
 	@NamedQuery(name="Post.findByStatus", query="SELECT p FROM Post p WHERE p.status=:status ORDER BY p.publishDate DESC"),
-	@NamedQuery(name="Post.getTotalPageByStatus", query="SELECT COUNT(p) FROM Post p WHERE p.status=:status")
+	@NamedQuery(name="Post.getTotalPageByStatus", query="SELECT COUNT(p) FROM Post p WHERE p.status=:status"),
+	@NamedQuery(name="Post.findRecentlyAddedPosts", query="SELECT p FROM Post p ORDER BY p.publishDate DESC"),
+	@NamedQuery(name="Post.getTotalPosts", query="SELECT COUNT(p) FROM Post p")
 })
 public class Post implements Serializable {
 	private static final long serialVersionUID = 1L;

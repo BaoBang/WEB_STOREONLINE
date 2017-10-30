@@ -1,3 +1,4 @@
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -6,14 +7,15 @@
 <html>
 <head>
 <title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/themes/css/admin.css">
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
-	<div class="wrapper">
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<c:set var="current_page_parent" value="page_product"></c:set>
+<c:set var="current_page" value="page_add_new_product"></c:set>
+<div class="wrapper">
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 
 
 		<!-- Content Wrapper. Contains page content -->
@@ -21,13 +23,9 @@
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
 			<h1>
-				Data Tables <small>advanced tables</small>
+				Sản Phẩm <small>PTiTShop</small>
 			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li><a href="#">Tables</a></li>
-				<li class="active">Data tables</li>
-			</ol>
+			
 			</section>
 
 			<!-- Main content -->
@@ -160,7 +158,7 @@
 	<!-- /.content-wrapper -->
 
 
-	<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+	<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 	<script type="text/javascript">
 		var li_id = 1, flagCateDigi = false, flagDigi = true;
 		/* $(document).ready(function() {
@@ -289,37 +287,39 @@ $(document).ready(function(){
 	var files = [];
 	$(document).on( "change","#form-upload",function(event) {
        files=event.target.files;
+     
      });
 
 	$(document) .on( "click","#btn-upload",function() {
        processUpload();
     });
-	
 	function processUpload() {
         var oMyForm = new FormData();
+        
         var imagePaths ="";
         for(var i = 0; i < files.length; i++){
-        	oMyForm.append("file", files[i]);
-        	$.ajax({dataType : 'json',
-                url : "${pageContext.request.contextPath}/ajax/upload/one-file",
-                data : oMyForm,
-                type : "POST",
-                enctype: 'multipart/form-data',
-                processData: false, 
-                contentType:false,
-                dataType:"text",
-                success: function(result) {
-              	  console.log("SUCCESS: ", result);
-              	
-              	  imagePaths += result + "\n";
-              	  $('#productImage').val(imagePaths);
-                    /* alert(result); */
-                },
-  	          error : function(e) {
-  	              console.log("ERROR: ", e);
-  	          }
-            });
-        }
+            
+       	   oMyForm.set("file", files[i]);	
+       		$.ajax({dataType : 'json',
+            url : "${pageContext.request.contextPath}/ajax/upload/one-file",
+            data : oMyForm,
+            type : "POST",
+            enctype: 'multipart/form-data',
+            processData: false, 
+            contentType:false,
+            dataType:"text",
+            success: function(result) {
+          	  console.log("SUCCESS: ", result);
+          	imagePaths += result + "\n";
+          	  $('#productImage').val(imagePaths);
+                /* alert(result); */
+            },
+	          error : function(e) {
+	              console.log("ERROR: ", e);
+	          }
+      	  });
+       	   
+       } 
        
     }
 });

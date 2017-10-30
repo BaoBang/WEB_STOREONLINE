@@ -29,21 +29,18 @@ public class AccountDAOImpl implements AccountDAO {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean checkUserName(String userName) {
-
 		Session session = sessionFactory.getCurrentSession();
-		Query<Account> query = session
-				.createQuery("select account from Account account where account.userName =:userName");
+		Query<Object> query = session.createQuery("select count(a) from Account a where a.userName=:userName");
 		query.setParameter("userName", userName);
-
-		return query.getResultList().size() > 0 ? true : false;
+		int numberRow = Integer.parseInt(String.valueOf(query.getSingleResult()));
+		return numberRow > 0 ? true : false;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Account findByUserName(String userName) {
 		Session session = sessionFactory.getCurrentSession();
-		Query<Account> query = session
-				.createQuery("select account from Account account where account.userName=:userName");
+		Query<Account> query = session.createQuery("select account from Account account where account.userName=:userName");
 		query.setParameter("userName", userName);
 		query.setMaxResults(1);
 		return query.getSingleResult();
@@ -97,6 +94,54 @@ public class AccountDAOImpl implements AccountDAO {
 		query.setFirstResult((page - 1) * Constants.NUMBER_ACCOUNT_IN_PAGE);
 		query.setMaxResults(Constants.NUMBER_ACCOUNT_IN_PAGE);
 		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public String getRoles(String userName) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Account> query = session.createQuery("select a from Account a where a.userName=:userName");
+		query.setParameter("userName", userName);
+		Account account = query.getResultList().size() > 0 ? query.getResultList().get(0) : null;
+		
+		return account == null ? "" : account.getRole();
+	}
+
+	@Override
+	public void add(Account account) {
+		Session session = sessionFactory.getCurrentSession();
+		session.persist(account);
+	}
+
+	@Override
+	public void delete(Account account) {
+		Session session = sessionFactory.getCurrentSession();
+		session.delete(account);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Account> findNews(int quantity) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Account> query = session.createNamedQuery("Account.findNews");
+		query.setMaxResults(quantity);
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public int getTotalAccounts() {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Object> query = session.createNamedQuery("Account.getTotalAccounts");
+		query.setMaxResults(1);
+		int totalAccounts = Integer.parseInt(String.valueOf(query.getSingleResult()));
+		return totalAccounts;
+	}
+
+	@Override
+	public void updateAccount(Account account) {
+		Session session = sessionFactory.getCurrentSession();
+		session.merge(account);
 	}
 
 }

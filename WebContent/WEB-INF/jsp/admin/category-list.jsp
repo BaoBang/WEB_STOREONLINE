@@ -1,19 +1,21 @@
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
+<title>Thể loại | Admin PTiTShop</title>
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
 
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+<c:set var="current_page_parent" value="page_category"></c:set>
+<c:set var="current_page" value="page_category_list"></c:set>
 <div class="wrapper">
 
-<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-  
-<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 
 
  <!-- Content Wrapper. Contains page content -->
@@ -21,14 +23,9 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Category
-        <small>Category list</small>
+        Thể loại
+        <small>PTiTShop</small>
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
-        <li><a href="#">Category</a></li>
-        <li class="active">Category List</li>
-      </ol>
     </section>
 
 	
@@ -39,35 +36,35 @@
 		<div class="col-md-12">
 		<div class="box">
             <div class="box-header with-border">
-              <h3 class="box-title">Category List</h3>
+              <h3 class="box-title">Danh sách các thể loại</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
               <table class="table table-bordered">
                 <tr>
-                  <th style="width: 10px">ID</th>
-                  <th style="width: 10px">Icon</th>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Description</th>
-                  <th>Parent Id</th>
-                  <th>Position</th>
-                  <th style="width: 40px">Status</th>
-                  <th style="width: 40px">Action</th>
+                  <th style="width: 10px; text-align: center;">ID</th>
+                  <th style="width: 10px; text-align: center;">Icon</th>
+                  <th style="text-align: center;">Tên</th>
+                  <th style="text-align: center;">Đường dẫn</th>
+                  <th style="text-align: center;">Mô tả</th>
+                  <th style="text-align: center;">ID gốc</th>
+                  <th style="text-align: center;">Thứ tự</th>
+                  <th style="width: 40px; text-align: center;">Trạng thái</th>
+                  <th style="width: 40px; text-align: center;"></th>
                 </tr>
                 <c:forEach var="c" items="${category_list}">
                 <c:if test="${c.parentId eq 0}">
                 <tr id="${c.id}">
-                  <td>${c.id}</td>
-                  <td>${c.image}</td>
+                  <td style="text-align: center;">${c.id}</td>
+                  <td style="text-align: center;"><i class="fa fa-lg ${c.image}"></i></td>
                   <td>${c.name}</td>
                   <td>${c.slug}</td>
                   <td>${c.description}</td>
-                  <td>${c.parentId}</td>
-                  <td>${c.position}</td>
-                  <td>
-                  	<c:if test="${c.status eq 1}"><span class="badge bg-green">Publish</span></c:if>
-                  	<c:if test="${c.status eq 0}"><span class="badge bg-yellow">Hidden</span></c:if>
+                  <td style="text-align: center;">${c.parentId}</td>
+                  <td style="text-align: center;">${c.position}</td>
+                  <td style="text-align: center;">
+                  	<c:if test="${c.status eq 1}"><span class="badge bg-green">Công khai</span></c:if>
+                  	<c:if test="${c.status eq 0}"><span class="badge bg-yellow">Đã ẩn</span></c:if>
                   </td>
                   <td>
                   	<div class="btn-group-vertical">
@@ -79,16 +76,16 @@
                 <c:forEach var="c2" items="${category_list}">
                 <c:if test="${c2.parentId eq c.id}">
                 <tr id="${c2.id}">
-                  <td>${c2.id}</td>
+                  <td style="text-align: center;">${c2.id}</td>
                   <td></td>
                   <td>${c2.name}</td>
                   <td>${c2.slug}</td>
                   <td>${c2.description}</td>
-                  <td>${c2.parentId}</td>
-                  <td>${c2.position}</td>
-                  <td>
-                  	<c:if test="${c2.status eq 1}"><span class="badge bg-green">Publish</span></c:if>
-                  	<c:if test="${c2.status eq 0}"><span class="badge bg-yellow">Hidden</span></c:if>
+                  <td style="text-align: center;">${c2.parentId}</td>
+                  <td style="text-align: center;">${c2.position}</td>
+                  <td style="text-align: center;">
+                  	<c:if test="${c2.status eq 1}"><span class="badge bg-green">Công khai</span></c:if>
+                  	<c:if test="${c2.status eq 0}"><span class="badge bg-yellow">Đã ẩn</span></c:if>
                   </td>
                   <td>
                   	<div class="btn-group-vertical">
@@ -122,8 +119,8 @@
               </div>
               <div class="modal-body"></div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline btn-modal-close pull-left" >Close</button>
-                <button type="button" id="btn-modal-delete" category-id="" class="btn btn-outline">Delete</button>
+                <button type="button" class="btn btn-outline btn-modal-close pull-left" >Hủy</button>
+                <button type="button" id="btn-modal-delete" category-id="" class="btn btn-outline">Xóa</button>
               </div>
             </div>
             <!-- /.modal-content -->
@@ -139,7 +136,7 @@
   <!-- /.content-wrapper -->
 	
 
-<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 <script type="text/javascript">
 $(document).ready(function(){
 	$('.btn-modal-close').click(function(){

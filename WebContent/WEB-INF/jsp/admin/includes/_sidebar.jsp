@@ -7,104 +7,104 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="${pageContext.request.contextPath}/themes/admin/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+          <img src="${user.avatar}" class="img-circle" alt="${user.getFullName()}">
         </div>
         <div class="pull-left info">
-          <p>Alexander Pierce</p>
-          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+          <p>${user.getFullName()}</p>
+          <a><i class="fa fa-circle text-success"></i> Online</a>
         </div>
       </div>
-      <!-- search form 
-      <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-        </div>
-      </form>
-      /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
         <li class="header">Bảng hoạt động chính</li>
-         <li class="treeview">
+        
+         <li class="treeview ${current_page eq 'page_dashboard' ? 'active':''}">
+          <a href="${pageContext.request.contextPath}/admin">
+            <i class="fa fa-tachometer" aria-hidden="true"></i>
+            <span>Tổng quan</span>
+          </a>
+         </li>
+         
+         <li class="treeview ${current_page_parent eq 'page_category' ? 'active':''}">
           <a href="${pageContext.request.contextPath}/admin/categories">
             <i class="fa fa-bars"></i>
             <span>Thể loại</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="${pageContext.request.contextPath}/admin/add-new-category"><i class="fa fa-circle-o"></i> Thêm thể loại</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/categories"><i class="fa fa-circle-o"></i> Danh sách thể loại</a></li>
+            <li class="${current_page eq 'page_add_new_category' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/add-new-category"><i class="fa fa-circle-o"></i> Thêm thể loại</a></li>
+            <li class="${current_page eq 'page_category_list' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/categories"><i class="fa fa-circle-o"></i> Danh sách thể loại</a></li>
           </ul>
         </li>
-        <li class="treeview">
+        <li class="treeview ${current_page_parent eq 'page_brand' ? 'active':''}">
           <a href="#">
             <i class="fa fa-university" aria-hidden="true"></i>
             <span>Hãng sản xuất</span>
              <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="${pageContext.request.contextPath }/admin/add-brand"><i class="fa fa-circle-o"></i>Thêm hãng</a></li>
-            <li><a href="${pageContext.request.contextPath }/admin/brand"><i class="fa fa-circle-o"></i>Danh sách hãng</a></li>
+            <li class="${current_page eq 'page_add_new_brand' ? 'active':''}"><a href="${pageContext.request.contextPath }/admin/add-brand"><i class="fa fa-circle-o"></i>Thêm hãng</a></li>
+            <li class="${current_page eq 'page_brand_list' ? 'active':''}"><a href="${pageContext.request.contextPath }/admin/brand"><i class="fa fa-circle-o"></i>Danh sách hãng</a></li>
           </ul>
         </li>
-         <li class="treeview">
+         <li class="treeview ${current_page_parent eq 'page_product' ? 'active':''}">
           <a href="#">
-           <i class="fa fa-scribd" aria-hidden="true"></i>
+           <i class="fa fa-shopping-bag" aria-hidden="true"></i>
             <span>Sản phẩm</span>
              <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="${pageContext.request.contextPath }/admin/add-product"><i class="fa fa-circle-o"></i>Thêm sản phẩm</a></li>
-            <li><a href="${pageContext.request.contextPath }/admin/product"><i class="fa fa-circle-o"></i>Danh sách sản phẩm</a></li>
+            <li class="${current_page eq 'page_add_new_product' ? 'active':''}"><a href="${pageContext.request.contextPath }/admin/add-product"><i class="fa fa-circle-o"></i>Thêm sản phẩm</a></li>
+            <li class="${current_page eq 'page_product_list' ? 'active':''}"><a href="${pageContext.request.contextPath }/admin/product"><i class="fa fa-circle-o"></i>Danh sách sản phẩm</a></li>
           </ul>
         </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-pie-chart"></i>
+        <li class="treeview ${current_page_parent eq 'page_order' ? 'active':''}">
+          <a href="${pageContext.request.contextPath }/admin/order-list">
+            <i class="fa fa-shopping-cart"></i>
             <span>Đơn hàng</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="../charts/chartjs.html"><i class="fa fa-circle-o"></i> ChartJS</a></li>
-            <li><a href="../charts/morris.html"><i class="fa fa-circle-o"></i> Morris</a></li>
-            <li><a href="../charts/flot.html"><i class="fa fa-circle-o"></i> Flot</a></li>
-            <li><a href="../charts/inline.html"><i class="fa fa-circle-o"></i> Inline charts</a></li>
+            <li class="${current_page eq 'page_order_list' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/order-list"><i class="fa fa-circle-o"></i> Danh sách đơn hàng</a></li>
           </ul>
         </li>
-         <li class="treeview">
+         <li class="treeview ${current_page_parent eq 'page_promotion' ? 'active':''}">
           <a href="#">
-            <i class="fa fa-diamond" aria-hidden="true"></i>
-            <span>Ưu đãi</span>
+            <i class="fa fa-bullhorn" aria-hidden="true"></i>
+            <span>Khuyến mãi</span>
              <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="${pageContext.request.contextPath }/admin/add-promotion"><i class="fa fa-circle-o"></i>Thêm ưu đãi</a></li>
-            <li><a href="${pageContext.request.contextPath }/admin/promotion"><i class="fa fa-circle-o"></i>Danh sách ưu đãi</a></li>
+            <li class="${current_page eq 'page_add_new_promotion' ? 'active':''}"><a href="${pageContext.request.contextPath }/admin/add-promotion"><i class="fa fa-circle-o"></i>Thêm khuyến mãi</a></li>
+            <li class="${current_page eq 'page_promotion_list' ? 'active':''}"><a href="${pageContext.request.contextPath }/admin/promotion"><i class="fa fa-circle-o"></i>Danh sách khuyến mãi</a></li>
           </ul>
         </li>
-        <li class="treeview">
+        <li class="treeview ${current_page_parent eq 'page_post' ? 'active':''}">
           <a href="${pageContext.request.contextPath}/admin/posts">
             <i class="fa fa-newspaper-o"></i>
             <span>Bài viết</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="${pageContext.request.contextPath}/admin/add-new-post"><i class="fa fa-circle-o"></i> Viết bài mới</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/posts"><i class="fa fa-circle-o"></i> Danh sách bài viết</a></li>
+            <li class="${current_page eq 'page_add_new_post' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/add-new-post"><i class="fa fa-circle-o"></i> Viết bài mới</a></li>
+            <li class="${current_page eq 'page_post_list' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/posts"><i class="fa fa-circle-o"></i> Danh sách bài viết</a></li>
           </ul>
         </li>
-        <li class="treeview">
+        <li class="treeview ${current_page_parent eq 'page_account' ? 'active':''}">
           <a href="${pageContext.request.contextPath}/admin/members">
             <i class="fa fa-users"></i> <span>Thành viên</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="${pageContext.request.contextPath}/admin/add-new-account"><i class="fa fa-circle-o"></i> Thêm thành viên</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/members"><i class="fa fa-circle-o"></i> Danh sách thành viên</a></li>
+            <li class="${current_page eq 'page_add_new_account' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/add-new-account"><i class="fa fa-circle-o"></i> Thêm thành viên</a></li>
+            <li class="${current_page eq 'page_account_list' ? 'active':''}"><a href="${pageContext.request.contextPath}/admin/members"><i class="fa fa-circle-o"></i> Danh sách thành viên</a></li>
           </ul>
+        </li>
+        <li class="treeview">
+          <a href="${pageContext.request.contextPath}/" target="_blank">
+            <i class="fa fa-external-link" aria-hidden="true"></i>
+            <span>PTiT Shop</span>
+          </a>
         </li>
       </ul>
     </section>

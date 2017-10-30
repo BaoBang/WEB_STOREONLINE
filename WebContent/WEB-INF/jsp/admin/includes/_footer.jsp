@@ -2,10 +2,9 @@
 
 <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 2.3.3
+      <b>Version</b> 1.0.1
     </div>
-    <strong>Copyright &copy; 2014-2015 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights
-    reserved.
+    © 2017 <strong>PTiT Shop</strong> | Designed and Developed by Lê Văn Tâm & Nguyễn Bảo Bằng</span>.
   </footer>
 
 <!-- ./wrapper -->

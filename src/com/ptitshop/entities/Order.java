@@ -12,12 +12,18 @@ import java.util.List;
  */
 @Entity
 @Table(name="orders")
-@NamedQuery(name="Order.findAll", query="SELECT o FROM Order o")
+@NamedQueries({
+	@NamedQuery(name="Order.findAll", query="SELECT o FROM Order o"),
+	@NamedQuery(name="Order.findOrderByCreated", query="SELECT o FROM Order o ORDER BY o.createdAt DESC"),
+	@NamedQuery(name="Order.getTotalPage", query="SELECT COUNT(o) FROM Order o"),
+	@NamedQuery(name="Order.getTotalOrders", query="SELECT COUNT(o) FROM Order o")
+})
 public class Order implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	public static final int STATUS_WAITING = 0;
-	public static final int STATUS_OK = 1;
+	public static final int STATUS_CANCELLED = -1;
+	public static final int STATUS_PENDING = 0;
+	public static final int STATUS_SHIPPED = 1;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

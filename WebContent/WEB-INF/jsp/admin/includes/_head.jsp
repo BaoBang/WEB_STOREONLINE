@@ -35,9 +35,12 @@
   
   
    <!-- date range picker -->
+
   <link media="all" rel="stylesheet" href="${pageContext.request.contextPath}/themes/plugins/daterangepicker/daterangepicker-bs3.css">
-  
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/themes/css/admin.css">
+
+  <%-- <link media="all" rel="stylesheet" href="${pageContext.request.contextPath}/themes/plugins/daterangepicker/daterangepicker-bs3.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/themes/css/admin.css"> --%>
+
   
   
   

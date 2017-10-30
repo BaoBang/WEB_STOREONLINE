@@ -11,7 +11,10 @@ public interface CategoryDAO {
 	public List<Category> findByStatus(int status);
 	public List<Category> findByParentId(int parentId);
 	
+	
 	public void add(Category category);
 	public void update(Category category);
 	public void delete(Category category);
+	
+	public List<Category> findByParentIdAndStatus(int parentId, int status);
  }

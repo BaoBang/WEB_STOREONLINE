@@ -1,8 +1,11 @@
 package com.ptitshop.controllers;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -29,6 +32,7 @@ import com.ptitshop.dao.OrderDAO;
 import com.ptitshop.dao.OrderDetailDAO;
 import com.ptitshop.dao.PostDAO;
 import com.ptitshop.dao.ProductDAO;
+import com.ptitshop.dao.ProductDetailDAO;
 import com.ptitshop.dao.ProductImageDAO;
 import com.ptitshop.entities.Account;
 import com.ptitshop.entities.AccountProfile;
@@ -38,12 +42,13 @@ import com.ptitshop.entities.Order;
 import com.ptitshop.entities.OrderDetail;
 import com.ptitshop.entities.Post;
 import com.ptitshop.entities.Product;
+import com.ptitshop.entities.ProductDetail;
 import com.ptitshop.entities.ProductImage;
 import com.ptitshop.models.Cart;
 import com.ptitshop.models.CartList;
 import com.ptitshop.models.ResultPagination;
 import com.ptitshop.utils.Constants;
-import com.ptitshop.utils.MD5Hash;
+import com.ptitshop.utils.BCryptEncoder;
 
 @Controller
 @Transactional
@@ -72,6 +77,9 @@ public class MainController {
 	private ProductDAO productDAO;
 	
 	@Autowired
+	private ProductDetailDAO productDetailDAO;
+	
+	@Autowired
 	private ProductImageDAO productImageDAO;
 	
 	@Autowired
@@ -88,21 +96,36 @@ public class MainController {
 	/*******************************************************************************************/
 	/************************************ ERROR PAGE *******************************************/
 	/*******************************************************************************************/
+	@RequestMapping(value="error")
+	public String test(){
+		return "error";
+	}
+
 	@RequestMapping(value="/404", method=RequestMethod.GET)
 	public String error404() {
-		return "404";
+		return "403";
 	}
 	
 	@RequestMapping(value="/403", method=RequestMethod.GET)
 	public String error403() {
 		return "403";
 	}
+	
 	/*******************************************************************************************/
 	/************************************* ACCOUNT *********************************************/
 	/*******************************************************************************************/
-	@RequestMapping(value={"/login"}, method=RequestMethod.GET)
-	public String login(Model model){
+	@RequestMapping(value={"/login"})
+	public String login(Model model, HttpServletRequest request){
 		loadData(model);
+		if(request.getParameter("btnSumit") != null){
+			Map<String, String[]> map = request.getParameterMap();
+			for(String key : map.keySet()){
+				String[]items = map.get(key);
+				for(int i = 0; i < items.length; i++){
+					System.out.println(key + ": "+ items[i] );
+				}
+			}
+		}
 		return "login";
 	}
 	
@@ -113,23 +136,24 @@ public class MainController {
 		return "login";
 	}
 	
-	@RequestMapping(value = { "/register" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/register" })
 	public String register(Model model, HttpServletRequest request,
 			@RequestParam(required = false, name = "username", defaultValue = "") String userName,
 			@RequestParam(required = false, name = "firstname", defaultValue = "") String firstName,
 			@RequestParam(required = false, name = "lastname", defaultValue = "") String lastName,
-			@RequestParam(required = false, name = "passWord", defaultValue = "") String passWord,
+			@RequestParam(required = false, name = "password", defaultValue = "") String passWord,
 			@RequestParam(required = false, name = "passWordComfirm", defaultValue = "") String passWordComfirm) {
 		loadData(model);
-
+		BCryptEncoder encoder = new BCryptEncoder();
 		if (request.getParameter("btnSubmit") != null) {
 
 			Account user = new Account();
-			user.setLastName(firstName);
-			user.setFirstName(lastName);
+			user.setLastName(lastName);
+			user.setFirstName(firstName);
 			user.setUserName(userName);
-			user.setSalt(MD5Hash.getSalt());
-			user.setPasswordHash(MD5Hash.MD5Encrypt(passWord + user.getSalt()));
+			user.setSalt(Constants.ZERO_NUMBER + "");
+			String hash = encoder.BCEncrypt(passWord);
+			user.setPasswordHash(hash);
 			user.setRole(Constants.DEFAULT_ROLE);
 			user.setId(Constants.DEUFAULT_ID);
 			user.setAvatar(Constants.DEFAULT_AVATAR);
@@ -174,8 +198,8 @@ public class MainController {
 				accountProfile.setGender(gender == 0 ? false : true);
 				accountProfile.setPhone(phone);
 				user.setAccountProfile(accountProfile);
-				accountProfileDAO.update(accountProfile);
-				accountDAO.update(user);
+				accountProfileDAO.updateAccountProfile(accountProfile);
+				accountDAO.updateAccount(user);
 				profileMessage = "Cập nhật thành công";
 			}else{
 				profileMessage = "Cập nhật thất bại";
@@ -184,8 +208,9 @@ public class MainController {
 
 		if(request.getParameter("submit-pass") != null){
 			Account user = accountDAO.findByUserName(userName);
+			BCryptEncoder encoder = new BCryptEncoder();
 			if(user != null){
-				String passwordHash = MD5Hash.MD5Encrypt(password + user.getSalt());
+				String passwordHash = encoder.BCEncrypt(password);
 				user.setPasswordHash(passwordHash);
 				accountDAO.update(user);
 				profileMessage = "Cập nhật thành công";
@@ -204,16 +229,32 @@ public class MainController {
 	/************************************* HOME PAGE *******************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value={"/home"}, method=RequestMethod.GET)
-	public String home(Model model){
-		loadData(model);
-		List<Product> phones = productDAO.getTopProductByCategoryId(Constants.PHONE_CATEGORY_ID, Product.STATUS_PUBLISH);
-		List<Product> tablets = productDAO.getTopProductByCategoryId(Constants.TABLET_CATEGORY_ID, Product.STATUS_PUBLISH);
-		List<Product> laptops = productDAO.getTopProductByCategoryId(Constants.LAPTOP_CATEGORY_ID, Product.STATUS_PUBLISH);
+	public String home(Model model, HttpServletRequest request){
+		HttpSession httpSession = request.getSession();
+		Account user = (Account) httpSession.getAttribute("user");
+		if(user == null){
+			Principal principal = request.getUserPrincipal();
+			if(principal != null)
+				user = accountDAO.findByUserName(principal.getName());
+		}
+		
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		List<Category> categoryList = categoryDAO.findByParentIdAndStatus(0, Category.STATUS_PUBLISH);
+		for (Category category : categoryList) {
+			List<Product> productList = productDAO.getTopProductByCategoryId(category.getId(), Product.STATUS_PUBLISH);
+			if (productList != null && productList.size() >= 4){
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("category", category);
+				map.put("list", productList);
+				result.add(map);
+			}
+		}
+		
 		List<Post> posts = postDAO.getTopByStatus(Post.STATUS_PUBLISH);
-		model.addAttribute("phones", phones);
-		model.addAttribute("tablets", tablets);
-		model.addAttribute("laptops", laptops);
 		model.addAttribute("posts",posts);
+		model.addAttribute("result", result);
+		httpSession.setAttribute("user", user);
+		loadData(model);
 		return "index";
 	}
 	
@@ -226,7 +267,7 @@ public class MainController {
 		if (product == null)
 			return "redirect:/404";
 		else {
-
+			productDAO.updateNumberViews(product.getId());
 			List<ProductImage> productImages = productImageDAO.findByProducDetailtId(product.getProductDetail().getId());
 			String digitals = convertJSONToDigitalForm(product.getProductDetail().getDigitals());
 			model.addAttribute("digitals", digitals);
@@ -256,8 +297,7 @@ public class MainController {
 				}
 			}
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+ 			e.printStackTrace();
 		}
 		return digitals;
 	}
@@ -302,6 +342,7 @@ public class MainController {
 		loadData(model);
 		return "category";
 	}
+	
 	
 	
 	/*******************************************************************************************/
@@ -366,13 +407,14 @@ public class MainController {
 		return "carts";
 	}
 	
-	@RequestMapping(value="/checkout", method=RequestMethod.GET)
+	@RequestMapping(value="/checkout")
 	public String checkout(
 			Model model, 
 			HttpServletRequest request,
+			@RequestParam(required=true, name="id-account") int id,
 			@RequestParam(required=true, name="address") String address){
 		
-		Account account = accountDAO.findById(1);
+		Account account = accountDAO.findById(id);
 		HttpSession session = request.getSession();
 		CartList cartList = (CartList) session.getAttribute("CART_LIST");
 		
@@ -380,26 +422,44 @@ public class MainController {
 		order.setAddress(address);
 		order.setCreatedAt(new Date());
 		order.setAccount(account);
-		order.setStatus(Order.STATUS_OK);
+		order.setStatus(Order.STATUS_PENDING);
 		order.setTotal(cartList.getTotalPrice());
 		orderDAO.add(order);
 		
 		for (Cart cart : cartList.getCarts()) {
-			OrderDetail orderDetail = new OrderDetail();
-			orderDetail.setOrder(order);
-			orderDetail.setProduct(cart.getProduct());
-			orderDetail.setPrice(cart.getProduct().getPrice());
-			orderDetail.setDiscount(cart.getProduct().getSalePrice());
-			orderDetail.setQuantity(cart.getQuantity());
-			orderDetailDAO.add(orderDetail);
+			ProductDetail productDetail = cart.getProduct().getProductDetail();
+			if (productDetail.getQuantity() >= cart.getQuantity()) {
+				productDetail.setQuantity(productDetail.getQuantity() - cart.getQuantity());
+				productDetailDAO.update(productDetail);
+				
+				OrderDetail orderDetail = new OrderDetail();
+				orderDetail.setOrder(order);
+				orderDetail.setProduct(cart.getProduct());
+				orderDetail.setPrice(cart.getProduct().getPrice());
+				orderDetail.setDiscount(cart.getProduct().getSalePrice());
+				orderDetail.setQuantity(cart.getQuantity());
+				orderDetailDAO.add(orderDetail);
+			}
 		}
-		
 		session.removeAttribute("CART_LIST");
 		
 		model.addAttribute("result", "Đã đặt hàng.");
-
 		loadData(model);
 		return "carts";
+	}
+	
+	
+	@RequestMapping(value="/search", method=RequestMethod.GET)
+	public String resultSearchProduct(
+			Model model,
+			@RequestParam(required = true, name = "q") String q,
+			@RequestParam(required = false, name = "page", defaultValue = "1") int page) {
+		int totalPage = productDAO.getTotalPageBySearchName(q);
+		List<Product> productList = productDAO.searchByName(q, page);
+		ResultPagination<Product> result = new ResultPagination<Product>(page, totalPage, productList);
+		model.addAttribute("result", result);
+		loadData(model);
+		return "search";
 	}
 
 	

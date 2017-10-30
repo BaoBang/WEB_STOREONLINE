@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page errorPage="error.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -28,9 +28,10 @@
 						<div class="login-form">
 							<form name="f" action="${pageContext.request.contextPath}/j_spring_security_check?${_csrf.parameterName}=${_csrf.token}" method="post">
 								<div class="form-group">
-									<label for="userName">Email</label> <input type="text"
+									<label for="userName">Email</label> 
+									<input type="text"
 										class="form-control" id="username" name="username"
-										aria-describedby="emailHelp" placeholder="Nhập vào email">
+										aria-describedby="emailHelp" placeholder="Nhập vào email" >
 									<small id="emailHelp" class="form-text text-muted">Chúng
 										tôi sẽ không chia sẽ tài khoản email của bạn với bất cứ ai.</small>
 								</div>

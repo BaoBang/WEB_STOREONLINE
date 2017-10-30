@@ -188,6 +188,75 @@ public class ProductDAOImpl implements ProductDAO {
 		Query<Product> query = session.createQuery("select p from Product p");
 		return query.getResultList();
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Product> searchByName(String q, int page) {
+		Session session = sessionFactory.getCurrentSession();
+		
+		Query<Product> query = session.createNamedQuery("Product.searchByName");
+		query.setParameter("status", Product.STATUS_PUBLISH);
+		query.setParameter("name", "%" + q + "%");
+		query.setFirstResult((page - 1) * Constants.NUMBER_PRODUCTS_IN_PAGE);
+		query.setMaxResults(Constants.NUMBER_PRODUCTS_IN_PAGE);
+		
+		return query.getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public int getTotalPageBySearchName(String q) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Object> query = session.createNamedQuery("Product.getTotalPageBySearchName");
+		query.setParameter("status", Product.STATUS_PUBLISH);
+		query.setParameter("name", "%" + q + "%");
+		query.setMaxResults(1);
+		
+		int totalProduct = Integer.parseInt(query.getSingleResult().toString());
+		int totalPage = (totalProduct / Constants.NUMBER_PRODUCTS_IN_PAGE) + (totalProduct % Constants.NUMBER_PRODUCTS_IN_PAGE == 0 ? 0 : 1);
+		
+		return totalPage;
+	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Product> findRecentlyAddedProducts(int quantity) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Product> query = session.createNamedQuery("Product.findRecentlyAddedProducts");
+		query.setMaxResults(quantity);
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public int getTotalProducts() {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Object> query = session.createNamedQuery("Product.getTotalProducts");
+		query.setMaxResults(1);
+		int totalProducts = Integer.parseInt(String.valueOf(query.getSingleResult()));
+		return totalProducts;
+	}
+
+	@Override
+	public void updateNumberViews(int productId) {
+		Session session = sessionFactory.getCurrentSession();
+		Product product = session.find(Product.class, productId);
+		if (product != null){
+			product.setViews(product.getViews() + 1);
+			session.merge(product);
+		}
+	}
+
+	@Override
+	public int getTotalProductByCategoryId(int categoryId) {
+		Session session = sessionFactory.getCurrentSession();
+
+		Query<Object> query = session.createNamedQuery("Product.getTotalProductByCategoryId");
+		query.setParameter("categoryId", categoryId);
+		query.setParameter("status", Product.STATUS_PUBLISH);
+		query.setMaxResults(1);
+		int totalProduct = Integer.parseInt(query.getSingleResult().toString());
+		return totalProduct;
+	}
 
 }

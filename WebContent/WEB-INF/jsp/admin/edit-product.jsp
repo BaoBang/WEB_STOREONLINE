@@ -1,19 +1,23 @@
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="com.ptitshop.entities.*" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/themes/css/admin.css">
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp"%>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+	<c:set var="current_page_parent" value="page_product"></c:set>
+	<c:set var="current_page" value="page_product_list"></c:set>
 	<div class="wrapper">
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+		<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp"%>
+		<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp"%>
 
 
 		<!-- Content Wrapper. Contains page content -->
@@ -21,13 +25,9 @@
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
 			<h1>
-				Data Tables <small>advanced tables</small>
+				Sản Phẩm <small>PTiTShop</small>
 			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li><a href="#">Tables</a></li>
-				<li class="active">Data tables</li>
-			</ol>
+
 			</section>
 
 			<!-- Main content -->
@@ -54,7 +54,8 @@
 								<div id="form-upload" class="form-group">
 									<label class="control-label col-md-4 col-lg-4">Hình</label>
 									<textarea type="text" class="form-control" id="productImage"
-										name="productimage" placeholder="Hình..." readonly="readonly" rows="5">${productImageStrings }</textarea>
+										name="productimage" placeholder="Hình..." readonly="readonly"
+										rows="5">${productImageStrings }</textarea>
 									<input type="file" name="files">
 									<button type="button" id="btn-upload" class="btn btn-primary">
 										<i class="fa fa-cloud-upload"></i> Upload
@@ -64,7 +65,8 @@
 									<label for="exampleInputPassword1">Loại sản phẩm</label> <select
 										class="form-control" name="productcategory">
 										<c:forEach items="${category_list }" var="category">
-											<option value="${category.id }">${category.name }</option>
+											<option value="${category.id }"
+												<c:if test="${ category.id eq product.category.id}">selected</c:if>>${category.name }</option>
 										</c:forEach>
 									</select>
 								</div>
@@ -72,27 +74,37 @@
 									<label for="exampleInputPassword1">Hãng sản xuất</label> <select
 										class="form-control" name="productbrand">
 										<c:forEach items="${brand_list }" var="brand">
-											<option value="${brand.id }">${brand.name }</option>
+											<option value="${brand.id }"
+												<c:if test="${ brand.id eq product.brand.id}">selected</c:if>>${brand.name }</option>
 										</c:forEach>
 									</select>
 								</div>
 								<div class="form-group">
+									<%
+										Product p = (Product)request.getAttribute("product");
+										Long price = Long.parseLong(String.format("%.0f", Double.parseDouble(p.getPrice()+"")));
+										Long salePrice =  Long.parseLong(String.format("%.0f", Double.parseDouble(p.getSalePrice()+"")));
+									%>
 									<label for="productprice">Đơn giá</label> <input type="number"
 										min="0" class="form-control" id="productprice"
 										name="productprice" placeholder="Nhập vào đơn giá sản phẩm"
-										required value="${product.price }">
+										required
+										value='<%= price %>' />
 								</div>
 								<div class="form-group">
+
 									<label for="productname">Giảm giá</label> <input type="number"
 										min="0" class="form-control" id="productsaleprice"
 										name="productsaleprice"
-										placeholder="Nhập vào đơn giá khuyến mãi" required value="${product.salePrice }">
+										placeholder="Nhập vào đơn giá khuyến mãi" required
+										value='<%= salePrice %>'>
 								</div>
 								<div class="form-group">
 									<label for="productquantity">Số lượng</label> <input
 										type="number" min="0" class="form-control"
 										id="productquantity" name="productquantity"
-										placeholder="Nhập vào số lượng sản phẩm" required value="${product.productDetail.quantity }">
+										placeholder="Nhập vào số lượng sản phẩm" required
+										value="${product.productDetail.quantity }">
 								</div>
 								<div class="form-group">
 									<label for="productquantity">Đặc điểm</label>
@@ -102,8 +114,7 @@
 								<div class="form-group">
 									<label for="productname">Chi tiết sản phẩm</label>
 									<div class="input-digital">
-										<ul id="list-inputs">
-											${digitalDetails }
+										<ul id="list-inputs">${digitalDetails }
 										</ul>
 										<button type="button"
 											class="btn btn-default btn-category-digital"
@@ -123,20 +134,23 @@
 													<c:set value="true" var="check"></c:set>
 												</c:if>
 											</c:forEach>
-											<option style="padding: 5px 0px;" value="${promotion.id }" ${check eq 'true' ? 'selected' : '' }>${promotion.name }</option>
+											<option style="padding: 5px 0px;" value="${promotion.id }"
+												${check eq 'true' ? 'selected' : '' }>${promotion.name }</option>
 										</c:forEach>
 									</select>
 								</div>
 								<div class="form-group">
 									<label>Trạng thái:</label>
 									<div class="radio">
-										<label>
-											<input name="productstatus" type="radio" value="1" ${product.status eq '1' ? 'checked' : '' } ><span class="badge bg-green">Hiện</span>
+										<label> <input name="productstatus" type="radio"
+											value="1" ${product.status eq '1' ? 'checked' : '' }><span
+											class="badge bg-green">Hiện</span>
 										</label>
 									</div>
 									<div class="radio">
-										<label> 
-											<input name="productstatus" type="radio" value="0" ${product.status eq '0' ? 'checked' : '' }><span class="badge bg-yellow">Ẩn</span>
+										<label> <input name="productstatus" type="radio"
+											value="0" ${product.status eq '0' ? 'checked' : '' }><span
+											class="badge bg-yellow">Ẩn</span>
 										</label>
 									</div>
 								</div>
@@ -166,7 +180,7 @@
 	<!-- /.content-wrapper -->
 
 
-	<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+	<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp"%>
 	<script type="text/javascript">
 		var li_id = $('ul#list-inputs li').length - 1, flagCateDigi = false, flagDigi = true;
 		disableButton(flagCateDigi, flagDigi);
@@ -284,45 +298,54 @@
 		});
 	</script>
 	<script type="text/javascript">
-$(document).ready(function(){
-	var files = [];
-	$(document).on( "change","#form-upload",function(event) {
-       files=event.target.files;
-     });
+		$(document)
+				.ready(
+						function() {
+							var files = [];
+							$(document).on("change", "#form-upload",
+									function(event) {
+										files = event.target.files;
+									});
 
-	$(document) .on( "click","#btn-upload",function() {
-       processUpload();
-    });
-	
-	function processUpload() {
-        var oMyForm = new FormData();
-        var imagePaths ="";
-        for(var i = 0; i < files.length; i++){
-        	oMyForm.append("file", files[i]);
-        	$.ajax({dataType : 'json',
-                url : "${pageContext.request.contextPath}/ajax/upload/one-file",
-                data : oMyForm,
-                type : "POST",
-                enctype: 'multipart/form-data',
-                processData: false, 
-                contentType:false,
-                dataType:"text",
-                success: function(result) {
-              	  console.log("SUCCESS: ", result);
-              	  imagePaths += result + "\n";
-              	  $('#productImage').val(imagePaths);
-                    /* alert(result); */
-                },
-  	          error : function(e) {
-  	              console.log("ERROR: ", e);
-  	          }
-            });
-        }
-       
-    }
-});
+							$(document).on("click", "#btn-upload", function() {
+								processUpload();
+							});
 
-</script>
+							function processUpload() {
+								var oMyForm = new FormData();
+
+								var imagePaths = "";
+								for (var i = 0; i < files.length; i++) {
+
+									oMyForm.set("file", files[i]);
+									$
+											.ajax({
+												dataType : 'json',
+												url : "${pageContext.request.contextPath}/ajax/upload/one-file",
+												data : oMyForm,
+												type : "POST",
+												enctype : 'multipart/form-data',
+												processData : false,
+												contentType : false,
+												dataType : "text",
+												success : function(result) {
+													console.log("SUCCESS: ",
+															result);
+													imagePaths += result + "\n";
+													$('#productImage').val(
+															imagePaths);
+													/* alert(result); */
+												},
+												error : function(e) {
+													console.log("ERROR: ", e);
+												}
+											});
+
+								}
+
+							}
+						});
+	</script>
 </body>
 
 </html>

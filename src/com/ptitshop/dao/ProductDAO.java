@@ -21,4 +21,13 @@ public interface ProductDAO {
 	
 	public void merge(Product product);
 	
+	public List<Product> searchByName(String q, int page);
+	public int getTotalPageBySearchName(String q);
+	
+	public List<Product> findRecentlyAddedProducts(int quantity);
+	public int getTotalProducts();
+	
+	public void updateNumberViews(int productId);
+	public int getTotalProductByCategoryId(int categoryId);
+	
 }

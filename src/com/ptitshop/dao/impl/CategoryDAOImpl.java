@@ -83,6 +83,16 @@ public class CategoryDAOImpl implements CategoryDAO {
 		Session session = sessionFactory.getCurrentSession();
 		session.delete(category);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Category> findByParentIdAndStatus(int parentId, int status) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Category> query = session.createNamedQuery("Category.findByParentIdAndStatus");
+		query.setParameter("parentId", parentId);
+		query.setParameter("status", status);
+		return query.getResultList();
+	}
 	
 
 	

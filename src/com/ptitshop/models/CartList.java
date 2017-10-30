@@ -27,7 +27,7 @@ public class CartList {
 	public void addCart(Cart cart) {
 		if (carts == null ||carts.isEmpty()){
 			totalProduct += cart.getQuantity();
-			totalPrice += (cart.getProduct().getSalePrice() > 0.0d ? cart.getProduct().getSalePrice() : cart.getProduct().getPrice());
+			totalPrice += ((cart.getProduct().getSalePrice() > 0.0d ? cart.getProduct().getSalePrice() : cart.getProduct().getPrice()) * cart.getQuantity());
 			carts = new ArrayList<Cart>();
 			carts.add(cart);
 		} else {
@@ -42,7 +42,7 @@ public class CartList {
 			if (!check) carts.add(cart);
 			
 			totalProduct += cart.getQuantity();
-			totalPrice += (cart.getProduct().getSalePrice() > 0.0d ? cart.getProduct().getSalePrice() : cart.getProduct().getPrice());
+			totalPrice += ((cart.getProduct().getSalePrice() > 0.0d ? cart.getProduct().getSalePrice() : cart.getProduct().getPrice()) * cart.getQuantity());
 		}
 	}
 
@@ -51,7 +51,7 @@ public class CartList {
 			for (Cart c : carts)
 				if (c.getProduct().getId() == product.getId()) {
 					totalProduct -= c.getQuantity();
-					totalPrice -= (c.getProduct().getSalePrice() > 0.0d ? c.getProduct().getSalePrice() : c.getProduct().getSalePrice());
+					totalPrice -= ((c.getProduct().getSalePrice() > 0.0d ? c.getProduct().getSalePrice() : c.getProduct().getSalePrice()) * c.getQuantity());
 					carts.remove(carts.indexOf(c));
 					return true;
 				}

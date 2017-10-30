@@ -11,6 +11,8 @@ public class Constants {
 	public static final int NUMBER_POST_IN_PAGE = 12;
 
 	public static final int NUMBER_ACCOUNT_IN_PAGE = 12;
+	
+	public static final int NUMBER_ORDER_IN_PAGE = 12;
 
 	public static final String PRODCUT_CART = "PRODUCT_CART";
 	// define paging results, use for default value of @RequestParam, so type of
@@ -37,6 +39,9 @@ public class Constants {
 	public static final boolean DEFAULT_GENDER = true;
 	public static final int DEFAULT_STATUS = 1;
 	public static final int ZERO_NUMBER = 0;
+	
+	public static final String DEFAULT_ACCOUNT_STATUS = "1";
+	
 	/*
 	 * This regex can be used to restrict passwords to a length of 6 to 20
 	 * aplhanumeric characters and select special characters. The password also

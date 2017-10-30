@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.fileupload.FileItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -15,13 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.ptitshop.models.UploadForm;
 import com.ptitshop.utils.Constants;
-import com.ptitshop.utils.MyUtils;
+import com.ptitshop.utils.ConvertCharacterUtils;
 
 
 @Controller
@@ -78,7 +80,7 @@ public class UploadFileWithAjaxController {
 
 				// Đổi tên file: giờ_phút_giây_tênFileGốc
 				String fileName = year + "-" + month + "-" + day + "-" + hour + "-" + minute + "-" + second + "-" + name;
-				String fileSlug = MyUtils.toURLFriendly(fileName);
+				String fileSlug = ConvertCharacterUtils.toURLFriendly(fileName);
 				
 				if (name != null && name.length() > 0) {
 					try {
@@ -98,4 +100,17 @@ public class UploadFileWithAjaxController {
 			}
 			return "";
 		}
+		
+		 @RequestMapping(value="/multiple-file", method=RequestMethod.POST )
+		    public @ResponseBody String multipleSave(@RequestParam("file") MultipartFile[] files, Model model,HttpServletRequest request){
+			 	String multi = "";
+		    	if (files != null && files.length >0) {
+		    		for(int i =0 ;i< files.length; i++){
+		    			CommonsMultipartFile file = new CommonsMultipartFile((FileItem) files[i]);
+		    			multi += doUpload(request, model, file);
+		    		}
+		    		
+		        } 
+		    	return multi;
+		    }
 }

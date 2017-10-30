@@ -102,4 +102,12 @@ public class PromotionDAOImpl implements PromotionDAO {
 		
 		return totalPage;
 	}
+
+	@Override
+	public List<Promotion> findByStatusandOrderByCreatedAt(int status, int limit) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Promotion> query = session.createQuery("select p from Promotion p where p.status=:status order by start_at limit 0," + limit);
+		query.setParameter("status", status);
+		return query.getResultList();
+	}
 }

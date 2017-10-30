@@ -14,8 +14,12 @@ import java.util.List;
 @Table(name="products")
 @NamedQueries({
 	@NamedQuery(name="Product.findAll", query="SELECT p FROM Product p"),
+	@NamedQuery(name="Product.findRecentlyAddedProducts", query="SELECT p FROM Product p ORDER BY p.createdAt DESC"),
 	@NamedQuery(name="Product.findByCategoryId", query="SELECT p FROM Product p WHERE p.category.id=:categoryId AND p.status=:status ORDER BY p.createdAt DESC"),
-	@NamedQuery(name="Product.getTotalProductByCategoryId", query="SELECT COUNT(p) FROM Product p WHERE p.category.id=:categoryId AND p.status=:status")
+	@NamedQuery(name="Product.getTotalProductByCategoryId", query="SELECT COUNT(p) FROM Product p WHERE p.category.id=:categoryId AND p.status=:status"),
+	@NamedQuery(name="Product.searchByName", query="SELECT p FROM Product p WHERE p.status=:status AND p.name LIKE :name"),
+	@NamedQuery(name="Product.getTotalPageBySearchName", query="SELECT COUNT(p) FROM Product p WHERE p.status=:status AND p.name LIKE :name"),
+	@NamedQuery(name="Product.getTotalProducts", query="SELECT COUNT(p) FROM Product p")
 })
 public class Product implements Serializable {
 	private static final long serialVersionUID = 1L;

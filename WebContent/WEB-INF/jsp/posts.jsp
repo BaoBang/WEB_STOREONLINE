@@ -1,3 +1,4 @@
+<%@ page errorPage="error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -5,7 +6,7 @@
 <html>
 <head>
   <jsp:include page="//WEB-INF/jsp/includes/_head.jsp"></jsp:include>
-  <title>PTiT Shop</title>
+  <title>Tin tức công nghệ | PTiT Shop</title>
 </head>
 <body>
 
@@ -16,7 +17,7 @@
   <div class="row">
     <div class="col-md-12">
       <ol class="breadcrumb breadcrumb-shop">
-        <li class="breadcrumb-item"><a href="#"><i class="fa fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="#"><i class="fa fa-home"></i> Trang chủ</a></li>
         <li class="breadcrumb-item active">Tin tức</li>
       </ol>
     </div>
@@ -26,15 +27,6 @@
     <div class="col-md-12">
       <div class="product-list-title">
         <span>TIN CÔNG NGHỆ</span>
-        <div class="dropdown float-right mr-0">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
-            Sắp xếp theo
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="#">Tin mới nhất</a>
-            <a class="dropdown-item" href="#">Xem nhiều nhất</a>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -70,12 +62,12 @@
     <ul class="pagination justify-content-center mt-4">
     <c:if test="${result.currentPage gt 1}">
       <li class="page-item">
-        <a class="page-link" href="${pageContext.request.contextPath}/category/${category.slug}/page-1">Đầu</a>
+        <a class="page-link" href="${pageContext.request.contextPath}/posts/page-1">Đầu</a>
       </li>
     </c:if>
     <c:forEach var="p" begin="${1}" end="${result.currentPage}">
     <c:if test="${p lt result.currentPage}">
-      <li class="page-item"><a class="page-link" href="${pageContext.request.contextPath}/category/${category.slug}/page-${p}">${p}</a></li>
+      <li class="page-item"><a class="page-link" href="${pageContext.request.contextPath}/posts/page-${p}">${p}</a></li>
     </c:if>
     </c:forEach>
     
@@ -83,13 +75,13 @@
 	
 	<c:forEach var="p" begin="${result.currentPage}" end="${result.totalPage}">
 	<c:if test="${p gt result.currentPage}">
-      <li class="page-item"><a class="page-link" href="${pageContext.request.contextPath}/category/${category.slug}/page-${p}">${p}</a></li>
+      <li class="page-item"><a class="page-link" href="${pageContext.request.contextPath}/posts/page-${p}">${p}</a></li>
 	</c:if>
     </c:forEach>
 	
 	<c:if test="${result.currentPage lt result.totalPage}">
       <li class="page-item">
-        <a class="page-link" href="${pageContext.request.contextPath}/category/${category.slug}/page-${result.totalPage}">Cuối</a>
+        <a class="page-link" href="${pageContext.request.contextPath}/posts/page-${result.totalPage}">Cuối</a>
       </li>
 	</c:if>
     </ul>

@@ -1,30 +1,29 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/themes/css/admin.css">
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
-	<div class="wrapper">
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<c:set var="current_page_parent" value="page_product"></c:set>
+<c:set var="current_page" value="page_product_list"></c:set>
+<div class="wrapper">
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
 			<h1>
-				Data Tables <small>advanced tables</small>
+				Sản Phẩm <small>PTiTShop</small>
 			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li><a href="#">Tables</a></li>
-				<li class="active">Data tables</li>
-			</ol>
+			
 			</section>
 			<!-- Main content -->
 			<section class="content">
@@ -36,68 +35,57 @@
 						</div>
 						<!-- /.box-header -->
 						<div class="box-body">
-							<table id="example1" class="table table-bordered table-striped">
+							<table id="example1" class="table table-bordered">
 								<thead>
 									<tr>
-										<th>STT</th>
-										<th>Hình</th>
-										<th>Tên sản phẩm</th>
-										<th>Loại sản phẩm</th>
-										<th>Hãng sản xuất</th>
-										<th>đơn giá</th>
-										<th>Giảm giá</th>
-										<th>Trạng thái</th>
-										<th>Ngày tạo</th>
-										<th>Chi tiết sản phẩm</th>
-										<th>Ưu đải</th>
-										<th></th>
+										<th style="width: 10px; text-align: center;">#</th>
+										<th style="text-align: center; width: 90px;">Hình</th>
+										<th style="width: 150px; text-align: center;">Tên sản phẩm</th>
+										<th style="text-align: center; width: 70px;">Loại</th>
+										<th style="text-align: center;width: 50px;">Hãng SX</th>
+										<th style="text-align: center;width: 60px;">Giá</th>
+										<th style="text-align: center;width: 60px;">Giảm giá</th>
+										<!-- <th style="text-align: center;min-width: 150px;">Ngày tạo</th> -->
+										<th style="text-align: center;width: 35px;">Tr Thái</th>
+										<th style="text-align: center; width: 10px;"></th>
 									</tr>
 								</thead>
 								<tbody>
 									<c:forEach var="p" items="${result}">
 										<tr id="${p.id }">
-											<td class="">${p.id}</td>
-											<td class="post-img">
-												<img src="${p.image}" alt="${p.image }" width="150px" height="200px"></td>
-											<td class="large-cell">${p.name}</td>
-											<td>${p.category.name}</td>
-											<td>${p.brand.name }</td>
-											<td><fmt:formatNumber type="currency" value="${p.price }" /></td>
-											<td><fmt:formatNumber type="currency" value="${p.salePrice }" /></td>
-											<td>
+											<td style="width: 10px;">${p.id}</td>
+											<td style="width: 100px;" class="post-img">
+												<img src="${p.image}" alt="${p.image }" width="80px" height="100px"></td>
+											<td style="width: 150px;">${p.name}</td>
+											<td style="width: 70px;">${p.category.name}</td>
+											<td style="width: 50px;">${p.brand.name }</td>
+											<td  style="width: 65px;"><fmt:formatNumber type="currency" value="${p.price }" /></td>
+											<td  style="width: 65px;"><fmt:formatNumber type="currency" value="${p.salePrice }" /></td>
+											<%-- <td  style="min-width: 150px;">
+												<fmt:formatDate pattern="dd '/' MM '/' yyyy" value="${p.createdAt }" />
+											</td> --%>
+											<td  style="width: 35px;">
 												<c:if test="${p.status eq 1}">
-													<span class="label label-success">Publish</span>
+													<span class="badge bg-green">Hiển thị</span>
 												</c:if> 
 												<c:if test="${p.status eq 0}">
-													<span class="label label-warning">Hidden</span>
+													<span class="badge bg-yellow">Đã ẩn</span>
 												</c:if>
 											</td>
-											<td>
-												<fmt:formatDate pattern="dd '/' MM '/' yyyy" value="${p.createdAt }" />
-											</td>
-											<td>
-												<a class="btn btn-info " href="${pageContext.request.contextPath }/admin/add-brand?brand-id=${p.id}">
-													<i class="fa fa-pencil-square-o"></i>
-												</a>
-											</td>
-											<td>
-												<a class="btn btn-info " href="${pageContext.request.contextPath }/admin/add-brand?brand-id=${p.id}">
-													<i class="fa fa-pencil-square-o"></i>
-												</a>
-											</td>
-											<td>
-												<a class="btn btn-info " href="${pageContext.request.contextPath }/admin/edit-product/${p.id}">
-													<i class="fa fa-pencil-square-o"></i>
-												</a> 
-												<button type="button" product-name="${p.name}"
+											
+											<td style="text-align: center;">
+							                	<div class="btn-group-vertical">
+							                		<a class="btn btn-info" href="${pageContext.request.contextPath }/admin/edit-product/${p.id}"><i class="fa fa-pencil-square-o"></i></a>
+							                		<button type="button" product-name="${p.name}"
 														product-id="${p.id}" class="btn btn-danger btn-remove-product">
 														<i class="fa fa-times"></i>
 													</button>
-											</td>
+							                	</div>
+							                </td>
 										</tr>
 									</c:forEach>
 								</tbody>
-								<tfoot>
+								 <!-- <tfoot>
 									<tr>
 										<th>STT</th>
 										<th>Hình</th>
@@ -112,7 +100,7 @@
 										<th>Ưu đải</th>
 										<th></th>
 									</tr>
-								</tfoot>
+								</tfoot>  -->
 							</table>
 						</div>
 						<!-- /.box-body -->
@@ -150,12 +138,12 @@
 		<!-- /.content-wrapper -->
 		
 
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+		<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// scroll
 				 $('#example1').DataTable( {
-			        "scrollX": true,
+			        "scrollX": false,
 			        "fnDrawCallback": function( oSettings ) {
 			        	showModal();
 			        }

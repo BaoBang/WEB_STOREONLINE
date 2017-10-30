@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page errorPage="error.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -8,6 +8,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <jsp:include page="//WEB-INF/jsp/includes/_head.jsp"></jsp:include>
 <title>PTit Shop | Sản Phẩm</title>
+ <!--  FACEBOOK COMMENT -->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v2.10&appId=1733140813646943";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 </head>
 <body>
 	<jsp:include page="//WEB-INF/jsp/includes/_header.jsp"></jsp:include>
@@ -77,7 +86,7 @@
 							</div>
 							<div class="area-promotion">
 								<c:if test="${product.promotions.size() gt 0 }">
-									</p>
+									
 									<strong>${product.promotions.size()} khuyến mãi áp
 										dụng đến <fmt:formatDate pattern="dd-MM-yyyy"
 											value="${product.promotions.get(0).endAt }" />
@@ -99,8 +108,8 @@
 			<div class="col-md-12">
 				<div class="product-detail">
 					<ul class="nav nav-tabs">
-						<li class="nav-item active"><a href="#feature"
-							class="nav-link" data-toggle="tab" role="tab">Đặc điểm nỗi
+						<li class="nav-item"><a href="#feature"
+							class="nav-link  active" data-toggle="tab" role="tab">Đặc điểm nỗi
 								bật</a></li>
 						<li class="nav-item"><a href="#digital" class="nav-link"
 							data-toggle="tab" role="tab">Thông số kĩ thuật</a></li>
@@ -109,7 +118,12 @@
 					</ul>
 					<div class="tab-content">
 						<div class="tab-pane active" id="feature" role="tabpanel">
+							<div class="post-detail">
+								<div class="post-content">
 									${product.productDetail.description }
+								</div>
+							</div>
+									
 						</div>
 						<div class="tab-pane" id="digital" role="tabpanel">
 							<ul class="digital-ul">
@@ -118,7 +132,13 @@
 						</div>
 
 						<div class="tab-pane" id="comment" role="tabpanel">
-							<div class="comment-box" style="height: 500px;"></div>
+							<div class="comment-box">
+							
+							<!--  FACEBOOK COMMENT -->
+            <div class="fb-comments" data-href="http://localhost:8080/PTiTShop/product?product_id=${product.id}" data-width="100%" data-numposts="5"></div>
+            
+							
+							</div>
 						</div>
 
 					</div>

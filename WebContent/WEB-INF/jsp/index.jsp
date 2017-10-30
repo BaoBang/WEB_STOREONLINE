@@ -1,3 +1,4 @@
+<%@ page errorPage="error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -28,26 +29,14 @@
 						<div class="carousel-item active">
 							<img class="d-block img-fluid" src="/PTiTShop/themes/images/banner-1.png"
 								alt="First slide">
-							<!-- <div class="carousel-caption d-none d-md-block">
-                <h3>First slide label</h3>
-                <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-              </div> -->
 						</div>
 						<div class="carousel-item">
 							<img class="d-block img-fluid" src="/PTiTShop/themes/images/banner-2.jpg"
 								alt="Second slide">
-							<!-- <div class="carousel-caption d-none d-md-block">
-                <h3>Second slide label</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div> -->
 						</div>
 						<div class="carousel-item">
 							<img class="d-block img-fluid" src="/PTiTShop/themes/images/banner-3.png"
 								alt="Third slide">
-							<!-- <div class="carousel-caption d-none d-md-block">
-                <h3>Third slide label</h3>
-                <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-              </div> -->
 						</div>
 					</div>
 					<a class="carousel-control-prev" href="#carouselExampleIndicators"
@@ -66,13 +55,13 @@
 			<div class="col-md-4 pl-0">
 				<aside class="home-news"> <figure>
 				<h2>
-					<a href="#">Tin công nghệ</a>
+					<a href="${pageContext.request.contextPath }/posts/">Tin công nghệ</a>
 				</h2>
 				<b></b> </figure>
 				<ul>
 					<c:forEach items="${posts }" var="post">
 						<li>
-							<a href="${pageContext.request.contextPath }/post/${post.slug}">
+							<a href="${pageContext.request.contextPath }/post/${post.id}/${post.slug}">
 								<img src="${post.image }" alt="${post.title }">
 								<h3 >${post.title }</h3>
 								<span>Ngày đăng: <fmt:formatDate value="${post.publishDate }" pattern="dd/MM/YYYY"/></span>
@@ -87,112 +76,45 @@
 
 		<div class="row">
 			<div class="col-md-12">
+			
+			
+			<c:forEach var="item" items="${result}">
 				<hr>
 				<div class="product-box">
 					<h3 class="product-box-title">
-						<span>Điện thoại nổi bật</span>
+						<span>${item.category.name} mới nhất</span>
 					</h3>
 					<div class="slider">
 						<div class="owl-carousel product-slider">
-							<c:forEach items="${phones }" var="phone">
+							<c:forEach items="${item.list}" var="p">
 								<!--Start a product item-->
 								<div class="product">
 									<div class="product-img">
-										<img class="" src="${phone.image }" />
+										<img class="" src="${p.image }" />
 									</div>
 									<h3 class="product-name">
-										<a href="${pageContext.request.contextPath}/product?product_id=${phone.id}">${phone.name }</a>
+										<a href="${pageContext.request.contextPath}/product?product_id=${p.id}">${p.name }</a>
 									</h3>
 
 									<h4 class="product-price">
 										Giá:
-										<fmt:formatNumber value="${phone.price}" type="currency"></fmt:formatNumber>
+										<fmt:formatNumber value="${p.price}" type="currency"></fmt:formatNumber>
 									</h4>
 									<div class="text-center txt-km">
-										Tiết kiệm đến <strong><fmt:formatNumber value="${phone.price - phone.salePrice }" type="currency"></fmt:formatNumber></strong>
+										Tiết kiệm đến <strong><fmt:formatNumber value="${p.price - p.salePrice }" type="currency"></fmt:formatNumber></strong>
 									</div>
-									<span> <button type="button" class="btn btn-add-to-cart"  product-id="${phone.id}">Thêm
+									<span> <button type="button" class="btn btn-add-to-cart"  product-id="${p.id}">Thêm
 											Giỏ Hàng</button>
 									</span>
-									<p class="info">${phone.overview }</p>
+									<p class="info">${p.overview }</p>
 								</div>
 								<!--End a product item-->
 							</c:forEach>
+							
 						</div>
 					</div>
 				</div>
-
-				<hr>
-				<div class="product-box">
-					<h3 class="product-box-title">
-						<span>Máy tính bảng nổi bật</span>
-					</h3>
-					<div class="slider">
-						<div class="owl-carousel product-slider">
-							<c:forEach items="${tablets }" var="tablet">
-								<!--Start a product item-->
-								<div class="product">
-									<div class="product-img">
-										<img class="" src="${tablet.image }" />
-									</div>
-									<h3 class="product-name">
-										<a href="${pageContext.request.contextPath}/product?product_id=${tablet.id}">${tablet.name }</a>
-									</h3>
-									<h4 class="product-price">
-										Giá:
-										<fmt:formatNumber value="${tablet.price}" type="currency"></fmt:formatNumber>
-									</h4>
-									<div class="text-center txt-km">
-										Khuyến mãi trị giá đến <strong><fmt:formatNumber
-												value="${tablet.price - tablet.salePrice }" type="currency"></fmt:formatNumber></strong>
-									</div>
-									<span> <button type="button" class="btn btn-add-to-cart"  product-id="${tablet.id}">Thêm
-											Giỏ Hàng</button>
-									</span>
-									<p class="info">${tablet.overview }</p>
-								</div>
-								<!--End a product item-->
-							</c:forEach>
-						</div>
-					</div>
-				</div>
-
-				<hr>
-				<div class="product-box">
-					<h3 class="product-box-title">
-						<span>Máy tính xách tay nổi bật</span>
-					</h3>
-					<div class="slider">
-						<div class="owl-carousel product-slider">
-							<c:forEach items="${laptops }" var="laptop">
-								<!--Start a product item-->
-								<div class="product">
-									<div class="product-img">
-										<img class="" src="${laptop.image }" />
-									</div>
-									<h3 class="product-name">
-										<a href="${pageContext.request.contextPath}/product?product_id=${laptop.id}">${laptop.name }</a>
-									</h3>
-									<h4 class="product-price">
-										Giá:
-										<fmt:formatNumber value="${laptop.price}" type="currency"></fmt:formatNumber>
-									</h4>
-									<div class="text-center txt-km">
-										Khuyến mãi trị giá đến <strong><fmt:formatNumber
-												value="${laptop.price - laptop.salePrice }" type="currency"></fmt:formatNumber></strong>
-									</div>
-									<span><button type="button" class="btn btn-add-to-cart"  product-id="${laptop.id}">Thêm
-											Giỏ Hàng</button>
-									</span>
-									<p class="info">${laptop.overview }</p>
-								</div>
-								<!--End a product item-->
-							</c:forEach>
-
-
-						</div>
-					</div>
-				</div>
+			</c:forEach>
 
 				<!--Brand-->
 				<hr>
@@ -224,7 +146,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Message</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Thông báo</h5>
         <button type="button" class="close btn-close-modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -263,21 +185,19 @@ $(document).ready(function(){
                  product_id:productId,
                  quantity:1
             },
-            /* timeout : 100000, */
+            timeout : 100000, 
             success : function(result) {
                 console.log("SUCCESS: ", result);
-                
-                $('.modal-body').html('<p class="text-success">Thêm thành công <strong>' + result + '</strong> vào giỏ hàng.</p>');
-                $('#modalAddToCart').modal('show');
-                
-                reload_cart_list();
-                var totalCart = $('#total-product-in-cart').text();
-                $('#total-product-in-cart').text(Number(totalCart) + 1);
-                
-             	// 2 giay sau sẽ tắt popup
-                /* setTimeout(function(){
-                    $('#modalAddToCart').modal('hide');
-                }, 2000); */
+                if (result == "false") {
+                	$('.modal-body').html('<p class="text-warning">Sản phẩm tạm hết hàng!</p>');
+	                $('#modalAddToCart').modal('show');
+                } else {
+	                $('.modal-body').html('<p class="text-success">Thêm thành công <strong>' + result + '</strong> vào giỏ hàng.</p>');
+	                $('#modalAddToCart').modal('show');
+	                reload_cart_list();
+	                var totalCart = $('#total-product-in-cart').text();
+	                $('#total-product-in-cart').text(Number(totalCart) + 1);
+                }
             },
             error : function(e) {
                 console.log("ERROR: ", e);

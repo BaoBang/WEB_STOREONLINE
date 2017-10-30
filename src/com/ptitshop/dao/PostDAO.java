@@ -18,4 +18,7 @@ public interface PostDAO {
 	public void add(Post post);
 	public void update(Post post);
 	public void delete(Post post);
+	
+	public List<Post> findRecentlyAddedPosts(int quantity);
+	public int getTotalPosts();
 }

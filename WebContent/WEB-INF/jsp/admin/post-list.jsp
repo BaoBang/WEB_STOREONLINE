@@ -1,19 +1,19 @@
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
-
+<title>Bài viết | PTiTShop AdminCP</title>
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+<c:set var="current_page_parent" value="page_post"/>
+<c:set var="current_page" value="page_post_list"/>
 <div class="wrapper">
-
-<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-  
-<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 
 
  <!-- Content Wrapper. Contains page content -->
@@ -21,14 +21,10 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        POST
-        <small>Post list</small>
+        Bài viết
+        <small>PTiTShop</small>
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
-        <li><a href="#">Post</a></li>
-        <li class="active">Post list</li>
-      </ol>
+     
     </section>
 
 	
@@ -39,41 +35,41 @@
 		<div class="col-xs-12">
           <div class="box">
             <div class="box-header">
-              <h3 class="box-title">Post list</h3>
+              <h3 class="box-title">Danh sách bài viết</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
               <table id="example1" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  	<th>ID</th>
-	                <th>Image</th>
-	                <th>Title</th>
+                  	<th style="text-align: center;">#</th>
+	                <th style="text-align: center;">Hình</th>
+	                <th style="text-align: center;">Tiêu đề</th>
 	               <!--  <th>Description</th> -->
-	                <th>Author</th>
-	                <th>Publish Date</th>
-	                <th>Last Edit</th>
-	                <th>View</th>
-	                <th>Status</th>
-	                <th>Action</th>
+	                <th style="text-align: center;">Tác giả</th>
+	                <th style="text-align: center;">Ngày đăng</th>
+	                <th style="text-align: center;">Lần sửa cuối</th>
+	                <th style="text-align: center;">Lượt xem</th>
+	                <th style="text-align: center;">Tình trạng</th>
+	                <th style="text-align: center;"></th>
                 </tr>
                 </thead>
                 <tbody>
                 <c:forEach var="p" items="${result.list}">
                 <tr id="${p.id}">
-	                <td>${p.id}</td>
-	                <td><img width="80px" height="60px" src="${p.image}" alt=""></td>
+	                <td style="text-align: center;">${p.id}</td>
+	                <td style="text-align: center;"><img width="80px" height="60px" src="${p.image}" alt=""></td>
 	                <td>${p.title}</td>
 	                <%-- <td width="350px">${p.description}</td> --%>
-	                <td>${p.account.getFullName()}</td>
-	                <td><fmt:formatDate pattern="dd '/' MM '/' yyyy" value="${p.publishDate}"/></td>
-	                <td><fmt:formatDate pattern="dd '/' MM '/' yyyy" value="${p.lastEdit}"/></td>
-	                <td>${p.views}</td>
-	                <td>
-	                	<c:if test="${p.status eq 1}"><span class="label label-success">Publish</span></c:if>
-	                	<c:if test="${p.status eq 0}"><span class="label label-warning">Hidden</span></c:if>
+	                <td style="text-align: center;">${p.account.getFullName()}</td>
+	                <td style="text-align: center;"><fmt:formatDate pattern="dd '/' MM '/' yyyy" value="${p.publishDate}"/></td>
+	                <td style="text-align: center;"><fmt:formatDate pattern="dd '/' MM '/' yyyy" value="${p.lastEdit}"/></td>
+	                <td style="text-align: center;">${p.views}</td>
+	                <td style="text-align: center;">
+	                	<c:if test="${p.status eq 1}"><span class="label label-success">Công khai</span></c:if>
+	                	<c:if test="${p.status eq 0}"><span class="label label-warning">Đã ẩn</span></c:if>
 					</td>
-	                <td>
+	                <td style="text-align: center;">
 	                	<div class="btn-group-vertical">
 	                		<a class="btn btn-info" href="${pageContext.request.contextPath}/admin/edit-post/${p.id}"><i class="fa fa-pencil-square-o"></i></a>
 	                		<button type="button" post-title="${p.title}" post-id="${p.id}" class="btn btn-danger btn-delete-post"><i class="fa fa-times"></i></button>
@@ -82,33 +78,37 @@
                 </tr>
                 </c:forEach>
                 </tbody>
-                <tfoot>
-                <tr>
-                	<th>ID</th>
-	                <th>Image</th>
-	                <th>Title</th>
-	                <!-- <th>Description</th> -->
-	                <th>Author</th>
-	                <th>Publish Date</th>
-	                <th>Last Edit</th>
-	                <th>View</th>
-	                <th>Status</th>
-	                <th>Action</th>
-                </tr>
-                </tfoot>
               </table>
             </div>
             <!-- /.box-body -->
             
+           <c:if test="${result.totalPage gt 1}">
            <div class="box-footer clearfix">
               <ul class="pagination pagination-sm no-margin pull-right">
-                <li><a href="#">&laquo;</a></li>
-                <li><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">&raquo;</a></li>
+              <c:if test="${result.currentPage gt 1}">
+                <li><a href="${pageContext.request.contextPath}/admin/posts?page=${result.currentPage - 1}">&laquo;</a></li>
+               </c:if>
+              <c:forEach var="p" begin="${1}" end="${result.currentPage}">
+              <c:if test="${p lt result.currentPage}">
+                <li><a href="${pageContext.request.contextPath}/admin/posts?page=${p}">${p}</a></li>
+              </c:if>
+              </c:forEach>
+                <li class="active"><a>${result.currentPage}</a></li>
+                
+             <c:forEach var="p" begin="${result.currentPage}" end="${result.totalPage}">
+			 <c:if test="${p gt result.currentPage}">
+                <li><a href="${pageContext.request.contextPath}/admin/posts?page=${p}">${p}</a></li>
+             </c:if>
+             </c:forEach>
+               
+               <c:if test="${result.currentPage lt result.totalPage}">
+                <li><a href="${pageContext.request.contextPath}/admin/posts?page=${result.currentPage + 1}">&raquo;</a></li>
+               </c:if>
               </ul>
             </div>
+           </c:if>
+            
+            
             
           </div>
           <!-- /.box -->
@@ -128,8 +128,8 @@
               </div>
               <div class="modal-body"></div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline btn-modal-close pull-left" >Close</button>
-                <button type="button" id="btn-modal-delete" post-id="" class="btn btn-outline">Delete</button>
+                <button type="button" class="btn btn-outline btn-modal-close pull-left" >Hủy</button>
+                <button type="button" id="btn-modal-delete" post-id="" class="btn btn-outline">Xóa</button>
               </div>
             </div>
             <!-- /.modal-content -->
@@ -144,7 +144,7 @@
 	</div>
   <!-- /.content-wrapper -->
 	
-<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 <!-- page script -->
 <script>
 $(document).ready(function(){

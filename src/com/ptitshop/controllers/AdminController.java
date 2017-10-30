@@ -1,6 +1,7 @@
 package com.ptitshop.controllers;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,29 +24,34 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.ptitshop.dao.AccountDAO;
+import com.ptitshop.dao.AccountProfileDAO;
 import com.ptitshop.dao.BrandDAO;
 import com.ptitshop.dao.CategoryDAO;
+import com.ptitshop.dao.OrderDAO;
+import com.ptitshop.dao.OrderDetailDAO;
 import com.ptitshop.dao.PostDAO;
 import com.ptitshop.dao.ProductDAO;
 import com.ptitshop.dao.ProductDetailDAO;
 import com.ptitshop.dao.ProductImageDAO;
 import com.ptitshop.dao.PromotionDAO;
 import com.ptitshop.entities.Account;
+import com.ptitshop.entities.AccountProfile;
 import com.ptitshop.entities.Brand;
 import com.ptitshop.entities.Category;
+import com.ptitshop.entities.Order;
+import com.ptitshop.entities.OrderDetail;
 import com.ptitshop.entities.Post;
 import com.ptitshop.entities.Product;
 import com.ptitshop.entities.ProductDetail;
 import com.ptitshop.entities.ProductImage;
 import com.ptitshop.entities.Promotion;
 import com.ptitshop.models.ResultPagination;
+import com.ptitshop.utils.BCryptEncoder;
 import com.ptitshop.utils.Constants;
-import com.ptitshop.utils.MD5Hash;
-import com.ptitshop.utils.MyUtils;
+import com.ptitshop.utils.ConvertCharacterUtils;
 
 @Controller
 @Transactional
@@ -54,6 +61,9 @@ public class AdminController {
 
 	@Autowired
 	private AccountDAO accountDAO;
+	
+	@Autowired
+	private AccountProfileDAO accountProfileDAO;
 
 	@Autowired
 	private PostDAO postDAO;
@@ -75,34 +85,14 @@ public class AdminController {
 
 	@Autowired
 	private ProductDetailDAO productDetailDAO;
+	
+	@Autowired
+	private OrderDAO orderDAO;
+	
+	@Autowired
+	private OrderDetailDAO orderDetailDAO;
 
-	@ResponseBody
-	@RequestMapping(value = "/test")
-	public String test() {
-		Product product = productDAO.findById(5);
-
-		Promotion promotion1 = promotionDAO.findById(1);
-		// Promotion promotion2 = promotionDAO.findById(2);
-		// Promotion promotion3 = promotionDAO.findById(3);
-
-		// List<Promotion> list = product.getPromotions();
-		// list.add(promotion3);
-		// list.add(promotion1);
-		// product.setPromotions(list);
-
-		// List<Product> list2 = promotion3.getProducts();
-		// list2.add(product);
-		// promotion3.setProducts(list2);
-
-		promotion1.getProducts().add(product);
-
-		promotionDAO.merge(promotion1);
-		// promotionDAO.test(promotion3);
-		productDAO.merge(product);
-
-		return "test thui mà...";
-	}
-
+	
 	private void loadData(Model model) {
 		List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
 		List<Brand> brandList = brandDAO.findByStatus(Brand.STATUS_PUBLISH);
@@ -111,21 +101,67 @@ public class AdminController {
 		model.addAttribute("brand_list", brandList);
 		model.addAttribute("promotion_list", promotionList);
 	}
-
+	
 	/*******************************************************************************************/
-	/************************************
-	 * ERROR PAGE
-	 *******************************************/
+	/************************************* ERROR PAGE ******************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value = "/403", method = RequestMethod.GET)
 	public String errorAdmin403() {
 		return "/admin/403";
 	}
 
+	
 	/*******************************************************************************************/
-	/**************************************
-	 * Brand PAGE
-	 *****************************************/
+	/************************************* DASHBOARD PAGE **************************************/
+	/*******************************************************************************************/
+	@RequestMapping(method = RequestMethod.GET)
+	public String admin(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		Account user = (Account) session.getAttribute("user");
+		if(user == null){
+			Principal principal = request.getUserPrincipal();
+			if(principal != null){
+				user = accountDAO.findByUserName(principal.getName());
+			}
+		}
+		
+		List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
+		String arrCategory [] = new String[categoryList.size()];
+		int arrTotalProduct [] = new int[categoryList.size()];
+		for (int i = 0; i < categoryList.size(); i++) {
+			int totalProduct = productDAO.getTotalProductByCategoryId(categoryList.get(i).getId());
+			arrCategory[i] = categoryList.get(i).getName();
+			arrTotalProduct[i] = totalProduct;
+		}
+		
+		List<Account> accountList = accountDAO.findNews(10);
+		List<Product> productList = productDAO.findRecentlyAddedProducts(5);
+		List<Post> postList	= postDAO.findRecentlyAddedPosts(5);
+		List<Order> orderList = orderDAO.findLatestOrders(5);
+		
+		int totalAccount = accountDAO.getTotalAccounts();
+		int totalProduct = productDAO.getTotalProducts();
+		int totalPost = postDAO.getTotalPosts();
+		int totalOrder = orderDAO.getToltalOrders();
+		
+		model.addAttribute("accountList", accountList);
+		model.addAttribute("productList", productList);
+		model.addAttribute("postList", postList);
+		model.addAttribute("orderList", orderList);
+		model.addAttribute("totalAccount", totalAccount);
+		model.addAttribute("totalProduct", totalProduct);
+		model.addAttribute("totalPost", totalPost);
+		model.addAttribute("totalOrder", totalOrder);
+		model.addAttribute("arrCategory", arrCategory);
+		model.addAttribute("arrTotalProduct", arrTotalProduct);
+		
+		session.setAttribute("user", user);
+		return "admin/index";
+	}
+
+
+	/*******************************************************************************************/
+	/*************************************** BRAND PAGE ****************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value = "/brand", method = RequestMethod.GET)
 	public String brand(Model model, @RequestParam(required = false, name = "page", defaultValue = "1") int page) {
@@ -190,7 +226,7 @@ public class AdminController {
 	}
 
 	/*******************************************************************************************/
-	/************************************** PRODUCT *******************************************/
+	/************************************** PRODUCT ********************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value = "/product")
 	public String product(Model model, @RequestParam(required = false, name = "page", defaultValue = "2") int page) {
@@ -261,6 +297,9 @@ public class AdminController {
 	private String pasreToJSONDigitals(String digitalDetails[]) {
 		String sjons = "[";
 		for (int i = 0; i < digitalDetails.length; i += 2) {
+			digitalDetails[i].replaceAll("\"", "\\\"");
+			digitalDetails[i + 1].replaceAll("\"", "\\\"");
+			System.out.println(digitalDetails[i + 1]);
 			if (digitalDetails[i + 1].equals("/")) {
 				if (i > 1) {
 					sjons += "]}";
@@ -307,7 +346,6 @@ public class AdminController {
 				}
 			}
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return digitals;
@@ -323,7 +361,6 @@ public class AdminController {
 			@RequestParam(required = true, name = "productsaleprice", defaultValue = "0") double productSalePrice,
 			@RequestParam(required = true, name = "productquantity", defaultValue = "0") int productQuantity,
 			@RequestParam(required = true, name = "productdescription", defaultValue = "") String productDescription) {
-		loadData(model);
 		String message = "";
 		if (request.getParameter("submit") != null) {
 			Product product = new Product();
@@ -385,9 +422,11 @@ public class AdminController {
 
 		}
 		model.addAttribute("message", message);
+		loadData(model);
 		return "/admin/add-product";
 	}
 
+	@SuppressWarnings("unused")
 	@RequestMapping(value = "/edit-product/{productId}")
 	public String eidtProduct(Model model, HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("productId") int productId,
@@ -462,7 +501,6 @@ public class AdminController {
 			}
 		}
 		String productImageStrings = getImageList(product);
-		System.out.println(productImageStrings);
 		model.addAttribute("digitalDetails", convertJSONToDigitalAdminForm(product.getProductDetail().getDigitals()));
 		model.addAttribute("message", message);
 		model.addAttribute("productImageStrings", productImageStrings);
@@ -482,9 +520,7 @@ public class AdminController {
 	}
 
 	/*******************************************************************************************/
-	/**************************************
-	 * PROMOTION PAGE
-	 *****************************************/
+	/*************************************** PROMOTION PAGE ************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value = "/promotion", method = RequestMethod.GET)
 	public String promotion(Model model, @RequestParam(required = false, name = "page", defaultValue = "1") int page) {
@@ -566,9 +602,7 @@ public class AdminController {
 	}
 
 	/*******************************************************************************************/
-	/*************************************
-	 * POST PAGE
-	 *******************************************/
+	/************************************** POST PAGE ******************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value = "/posts", method = RequestMethod.GET)
 	public String postList(Model model, @RequestParam(required = false, name = "page", defaultValue = "1") int page) {
@@ -577,7 +611,7 @@ public class AdminController {
 			return "redirect:/admin/403";
 
 		List<Post> postList = postDAO.findAllByPagination(page);
-		ResultPagination<Post> result = new ResultPagination<>(page, totalPage, postList);
+		ResultPagination<Post> result = new ResultPagination<Post>(page, totalPage, postList);
 
 		model.addAttribute("result", result);
 		return "/admin/post-list";
@@ -610,7 +644,7 @@ public class AdminController {
 			errors.put("title", "Tiêu đề không được để trống!");
 		else {
 			post.setTitle(title);
-			String slug = MyUtils.toURLFriendly(title);
+			String slug = ConvertCharacterUtils.toURLFriendly(title);
 			post.setSlug(slug);
 		}
 
@@ -640,11 +674,12 @@ public class AdminController {
 			// add
 			postDAO.add(post);
 			model.addAttribute("result", true);
-		} else
+			model.addAttribute("post_title", post.getTitle());
+		} else {
 			model.addAttribute("result", false);
+			model.addAttribute("post", post);
+		}
 		model.addAttribute("errors", errors);
-
-		model.addAttribute("post", post);
 
 		return "/admin/add-new-post";
 	}
@@ -684,7 +719,7 @@ public class AdminController {
 
 			// Slug
 			if (null == slug || slug.length() <= 0)
-				slug = MyUtils.toURLFriendly(post.getTitle());
+				slug = ConvertCharacterUtils.toURLFriendly(post.getTitle());
 			post.setSlug(slug);
 
 			// Description
@@ -727,9 +762,7 @@ public class AdminController {
 	}
 
 	/*******************************************************************************************/
-	/***********************************
-	 * CATEGORY PAGE
-	 *****************************************/
+	/************************************ CATEGORY PAGE ****************************************/
 	/*******************************************************************************************/
 	@RequestMapping(value = "/categories", method = RequestMethod.GET)
 	public String categoryList(Model model) {
@@ -749,6 +782,7 @@ public class AdminController {
 	public String doAddNewCategory(Model model, @RequestParam(name = "category_name", required = true) String name,
 			@RequestParam(name = "category_slug", required = true) String slug,
 			@RequestParam(name = "category_description", required = true) String description,
+			@RequestParam(name = "category_position", required = true, defaultValue= "1") int position,
 			@RequestParam(name = "category_parent_id", required = true, defaultValue = "0") int parentId,
 			@RequestParam(name = "category_status", required = true) int status,
 			@RequestParam(name = "category_image", required = false) String image) {
@@ -770,6 +804,12 @@ public class AdminController {
 		else
 			category.setDescription(description);
 
+		if (position < 1){
+			errors.put("position", "Thứ tự không khợp lệ");
+		} else {
+			category.setPosition(position);
+		}
+		
 		if (parentId == 0) {
 			if (null == image || image.trim().length() <= 0)
 				errors.put("image", image);
@@ -791,12 +831,14 @@ public class AdminController {
 		if (errors.isEmpty()) {
 			categoryDAO.add(category);
 			model.addAttribute("result", true);
-		} else
+			model.addAttribute("category_name", category.getName());
+		} else{
 			model.addAttribute("result", false);
-
+			model.addAttribute("category", category);
+		}
+		
 		List<Category> categoryList = categoryDAO.findByStatus(Category.STATUS_PUBLISH);
 		model.addAttribute("category_list", categoryList);
-		model.addAttribute("category", category);
 
 		return "/admin/add-new-category";
 	}
@@ -816,6 +858,7 @@ public class AdminController {
 	public String doEditCategory(Model model, @PathVariable("id") int id,
 			@RequestParam(name = "category_name", required = true) String name,
 			@RequestParam(name = "category_slug", required = true) String slug,
+			@RequestParam(name = "category_position", required = true, defaultValue= "1") int position,
 			@RequestParam(name = "category_description", required = true) String description,
 			@RequestParam(name = "category_parent_id", required = true, defaultValue = "0") int parentId,
 			@RequestParam(name = "category_status", required = true) int status,
@@ -832,7 +875,7 @@ public class AdminController {
 				category.setName(name);
 
 			if (null == slug || slug.trim().length() <= 0)
-				errors.put("slug", "Đường dận thể loại không được để trống.");
+				errors.put("slug", "Đường dẫn thể loại không được để trống.");
 			else
 				category.setSlug(slug);
 
@@ -841,15 +884,22 @@ public class AdminController {
 			else
 				category.setDescription(description);
 
+			if (position < 1){
+				errors.put("position", "Thứ tự không khợp lệ");
+			} else {
+				category.setPosition(position);
+			}
+			
 			if (parentId == 0) {
 				if (null == image || image.trim().length() <= 0)
 					errors.put("image", image);
 				else
 					category.setImage(image);
 			} else {
+				category.setImage(null);
 				Category parentCategory = categoryDAO.findById(parentId);
 				if (parentCategory == null || parentCategory.getParentId() != 0)
-					errors.put("parentId", "út gốc không hợp lệ.");
+					errors.put("parentId", "Nút gốc không hợp lệ.");
 				else
 					category.setParentId(parentId);
 			}
@@ -876,9 +926,7 @@ public class AdminController {
 	}
 
 	/*******************************************************************************************/
-	/************************************
-	 * ACCOUNT PAGE
-	 *****************************************/
+	/************************************* ACCOUNT PAGE ****************************************/
 	/*******************************************************************************************/
 
 	@RequestMapping(value = "/members", method = RequestMethod.GET)
@@ -906,21 +954,30 @@ public class AdminController {
 			@RequestParam(required = true, name = "account_phone") String phone,
 			@RequestParam(required = true, name = "account_address") String address,
 			@RequestParam(required = true, name = "account_biography") String biography,
-			@RequestParam(required = true, name = "account_gender", defaultValue = "0") int gender) {
+			@RequestParam(required = false, name = "account_avatar", defaultValue = Constants.DEFAULT_AVATAR) String avatar,
+			@RequestParam(required = true, name = "account_gender", defaultValue = "0") int gender,
+			@RequestParam(required = false, name = "account_role") String role) {
 
 		Account account = accountDAO.findById(id);
 		if (account == null)
-			// model.addAttribute("result", false);
 			return "redirect:/admin/403";
 		else {
 			account.setFirstName(firstName);
 			account.setLastName(lastName);
-			account.getAccountProfile().setEmail(email);
-			account.getAccountProfile().setPhone(phone);
-			account.getAccountProfile().setAddress(address);
-			account.getAccountProfile().setBiography(biography);
-			account.getAccountProfile().setGender(gender == 0 ? false : true);
-			accountDAO.update(account);
+			account.setAvatar(avatar);
+			if (role != null && (role.equals(Account.ROLE_ADMIN) || role.equals(Account.ROLE_USER))) account.setRole(role);
+			
+			AccountProfile accountProfile = account.getAccountProfile();
+			accountProfile.setEmail(email);
+			accountProfile.setPhone(phone);
+			accountProfile.setAddress(address);
+			accountProfile.setBiography(biography);
+			accountProfile.setGender(gender == 0 ? false : true);
+			
+			account.setAccountProfile(accountProfile);
+			accountProfileDAO.updateAccountProfile(accountProfile);
+			accountDAO.updateAccount(account);
+			
 			model.addAttribute("account", account);
 			model.addAttribute("result", true);
 		}
@@ -934,6 +991,7 @@ public class AdminController {
 			@RequestParam(required = true, name = "new_password") String newPassword,
 			@RequestParam(required = true, name = "confirm_password") String confirmPassword) {
 		Account account = accountDAO.findById(id);
+		BCryptEncoder encoder = new BCryptEncoder();
 		if (account == null) {
 			return "/admin/403";
 		} else {
@@ -944,9 +1002,9 @@ public class AdminController {
 				errors_password.put("new_password", "Mật khẩu mới không được bỏ trống!");
 			if (confirmPassword == null || confirmPassword.length() <= 0)
 				errors_password.put("confirm_password", "Xác nhận mật khẩu không được bỏ trống!");
-
-			String passwordHash = MD5Hash.MD5Encrypt(currentPassword + account.getSalt());
-			if (!passwordHash.equals(account.getPasswordHash())) {
+			
+			String passwordHash = encoder.BCEncrypt(currentPassword);
+			if (passwordHash.equals(account.getPasswordHash())) {
 				errors_password.put("current_password", "Mật khẩu không chính xác!");
 			} else if (!newPassword.equals(confirmPassword)) {
 				errors_password.put("confirm_password", "Xác nhận mật khẩu không chính xác!");
@@ -955,18 +1013,113 @@ public class AdminController {
 			if (!errors_password.isEmpty()) {
 				model.addAttribute("result_reset_password", false);
 			} else {
-				String newSalt = MD5Hash.getSalt();
-				String hashPassword = MD5Hash.MD5Encrypt(newPassword + newSalt);
-				account.setSalt(newSalt);
+				String hashPassword = encoder.BCEncrypt(newPassword);
+				account.setSalt(Constants.ZERO_NUMBER + "");
 				account.setPasswordHash(hashPassword);
 
-				accountDAO.update(account);
+				accountDAO.updateAccount(account);
 				model.addAttribute("result_reset_password", true);
 			}
 
 			model.addAttribute("account", account);
 		}
 		return "/admin/profile";
+	}
+	
+	@RequestMapping(value="/add-new-account", method=RequestMethod.GET)
+	public String addNewAccount() {
+		return "/admin/add-new-account";
+	}
+	
+	@RequestMapping(value="/add-new-account", method=RequestMethod.POST)
+	public String doAddNewAccount(
+			Model model,
+			@RequestParam(required=true, name="account_user_name") String userName,
+			@RequestParam(required=true, name="account_first_name") String firstName,
+			@RequestParam(required=true, name="account_last_name") String lastName,
+			@RequestParam(required=false, name="account_role", defaultValue=Constants.DEFAULT_ROLE) String role,
+			@RequestParam(required=true, name="account_password") String password,
+			@RequestParam(required=true, name="account_confirm_password") String confirmPassword,
+			@RequestParam(required=false, name="account_status", defaultValue=Constants.DEFAULT_ACCOUNT_STATUS) int status,
+			@RequestParam(required=false, name="account_avatar", defaultValue=Constants.DEFAULT_AVATAR) String avatar) {
+		
+		BCryptEncoder encoder = new BCryptEncoder();
+		String passwordHash = encoder.BCEncrypt(password);
+		
+		Account account = new Account();
+		account.setUserName(userName);
+		account.setFirstName(firstName);
+		account.setLastName(lastName);
+		account.setAvatar(avatar);
+		account.setStatus(status);
+		account.setRole(role);
+		account.setPasswordHash(passwordHash);
+		account.setSalt(Constants.ZERO_NUMBER + "");
+		account.setCreatedAt(new Date());
+		AccountProfile accountProfile = new AccountProfile();
+		accountProfile.setGender(Constants.DEFAULT_GENDER);
+		accountProfileDAO.add(accountProfile);
+		account.setAccountProfile(accountProfile);
+		
+		accountDAO.add(account);
+
+		return "redirect:/admin/members";
+	}
+	
+	@RequestMapping(value = "/delete-account", method=RequestMethod.POST)
+	public String deleteAccount(@RequestParam (required = true, name = "id_account") int idAccount) {
+		Account account = accountDAO.findById(idAccount);
+		if (account != null) {
+			AccountProfile accountProfile = accountProfileDAO.findById(account.getAccountProfile().getId());
+			accountDAO.delete(account);
+			accountProfileDAO.delete(accountProfile);
+		}
+		return "redirect:/admin/members";
+	}
+	
+	/*******************************************************************************************/
+	/************************************** ORDER PAGE *****************************************/
+	/*******************************************************************************************/
+	@RequestMapping(value="/order-list", method=RequestMethod.GET)
+	public String orderList(Model model, @RequestParam(required=false, name="page", defaultValue="1") int page) {
+		int totalPage = orderDAO.getTotalPage();
+		if (page <= 0 || page > totalPage) return "redirect:/admin/403";
+		
+		List<Order> orderList = orderDAO.findByPagination(page);
+		ResultPagination<Order> result = new ResultPagination<Order>(page, totalPage, orderList);
+		model.addAttribute("result", result);
+		
+		return "/admin/order-list";
+	}
+	
+	@RequestMapping(value="/order-detail/{id}", method = RequestMethod.GET)
+	public String orderDetail(Model model, @PathVariable("id") int id) {
+		Order order = orderDAO.findById(id);
+		if (order == null) return "redirect:/admin/403";
+		else {
+			List<OrderDetail> orderDetailList = orderDetailDAO.findByOrderId(order.getId());
+			model.addAttribute("order", order);
+			model.addAttribute("order_detail_list", orderDetailList);
+		}
+		return "/admin/order-detail";
+	}
+	
+	@RequestMapping(value="/order-detail/{id}", method=RequestMethod.POST)
+	public String changeStatusOrder(
+			Model model, 
+			@PathVariable("id") int id, 
+			@RequestParam(required = true, name = "order_status", defaultValue = "0") int status){
+		Order order = orderDAO.findById(id);
+		if (order == null) return "redirect:/admin/403";
+		else {
+			order.setStatus(status);
+			orderDAO.update(order);
+			
+			List<OrderDetail> orderDetailList = orderDetailDAO.findByOrderId(order.getId());
+			model.addAttribute("order", order);
+			model.addAttribute("order_detail_list", orderDetailList);
+		}
+		return "/admin/order-detail";
 	}
 
 }

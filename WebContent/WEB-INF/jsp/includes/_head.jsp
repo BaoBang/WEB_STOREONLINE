@@ -20,5 +20,14 @@
   <!-- Shop CSS -->
   <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/themes/css/style.css">
 
-  
+  <style>
+<!--
+	.navbar.navbar-static-top{
+		background-color: red;
+	}
+	.main-header>.skin-blue .main-header .navbar{
+	background-color: red;
+	}
+-->
+</style>
   

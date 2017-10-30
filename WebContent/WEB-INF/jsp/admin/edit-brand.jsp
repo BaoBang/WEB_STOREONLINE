@@ -1,3 +1,4 @@
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -6,15 +7,14 @@
 <html>
 <head>
 <title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
-
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
-	<div class="wrapper">
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<c:set var="current_page_parent" value="page_brand"></c:set>
+<c:set var="current_page" value="page_brand_list"></c:set>
+<div class="wrapper">
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 
 
 		<!-- Content Wrapper. Contains page content -->
@@ -22,13 +22,9 @@
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
 			<h1>
-				Data Tables <small>advanced tables</small>
+				Hãng <small>PTiTShop</small>
 			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li><a href="#">Tables</a></li>
-				<li class="active">Data tables</li>
-			</ol>
+			
 			</section>
 
 
@@ -99,7 +95,7 @@
 	<!-- /.content-wrapper -->
 
 
-	<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+	<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 	<script type="text/javascript">
 $(document).ready(function(){
 	var files = [];

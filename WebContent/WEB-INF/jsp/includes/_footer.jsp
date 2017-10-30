@@ -50,17 +50,19 @@
 			var input_data = $(this).val();
 			search(input_data);
 			
+			
 		});
 		function search(input_data) {
-			$.ajax({type : "GET",
+			$.ajax({type : "POST",
 						url : "${pageContext.request.contextPath}/ajax/search",
 						data : {
 							inputdata : input_data
 						},
 						success : function(result) {
-							
 							$('#search-result-main').html(result);
-							
+							var numberOfResultSearch = $('#number-of-result-search').text();
+							$(".search-price").append("đ");
+							$('#number-of-result-search').html("<h4>Có " + numberOfResultSearch +" sản phẩm được tìm thấy.</h4>");
 						}
 					});
 

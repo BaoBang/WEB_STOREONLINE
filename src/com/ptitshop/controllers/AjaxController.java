@@ -1,7 +1,9 @@
 package com.ptitshop.controllers;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +37,7 @@ import com.ptitshop.entities.Promotion;
 import com.ptitshop.models.Cart;
 import com.ptitshop.models.CartList;
 import com.ptitshop.utils.Constants;
-import com.ptitshop.utils.MD5Hash;
+import com.ptitshop.utils.BCryptEncoder;
 
 @Controller
 @Transactional
@@ -72,20 +74,22 @@ public class AjaxController {
 		System.out.println("## AJAX add-to-cart: " + productId);
 
 		Product product = productDAO.findById(productId);
+		if (product.getProductDetail().getQuantity() >= quantity) {
 
-		Cart cart = new Cart(quantity, product);
+			Cart cart = new Cart(quantity, product);
 
-		HttpSession session = request.getSession();
+			HttpSession session = request.getSession();
 
-		CartList cartList = (CartList) session.getAttribute("CART_LIST");
-		if (cartList == null)
-			cartList = new CartList();
+			CartList cartList = (CartList) session.getAttribute("CART_LIST");
+			if (cartList == null)
+				cartList = new CartList();
 
-		cartList.addCart(cart);
-
-		session.setAttribute("CART_LIST", cartList);
-
-		return product.getName();
+			cartList.addCart(cart);
+			session.setAttribute("CART_LIST", cartList);
+			return product.getName();
+		} else {
+			return "false";
+		}
 	}
 
 	@ResponseBody
@@ -114,6 +118,23 @@ public class AjaxController {
 		model.addAttribute("cart_list", cartList);
 		return "/includes/_cart-list";
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/get-total-product")
+	public String getTotalProductInCart(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		CartList cartList = (CartList) session.getAttribute("CART_LIST");
+		return String.valueOf(cartList.getTotalProduct());
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/get-total-price")
+	public String getTotalPriceInCart(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		CartList cartList = (CartList) session.getAttribute("CART_LIST");
+		return "<fmt:formatNumber value=\""+ cartList.getTotalPrice() +"\" type=\"currency\"/>";
+	}
+	
 
 	@ResponseBody
 	@RequestMapping(value = { "/delete-post-with-ajax" }, method = RequestMethod.GET)
@@ -145,7 +166,7 @@ public class AjaxController {
 	@RequestMapping(value = "/check-user-name", method = RequestMethod.GET)
 	public String checkUserName(HttpServletResponse response,
 			@RequestParam(name = "username", required = true) String userName) throws IOException {
-		if (accountDAO.checkUserName(userName) || !userName.matches(Constants.USER_NAME_REGULAR)) {
+		if (accountDAO.checkUserName(userName) || userName.equals("")) {
 			// return "<img src=\"/PTiTShop/images/not-available.png\"/>";
 			return "not-available";
 		} else {
@@ -159,19 +180,13 @@ public class AjaxController {
 	public String checkPassWordComfirm(HttpServletResponse response,
 			@RequestParam(name = "password", required = true) String password,
 			@RequestParam(name = "passwordComfirm", required = true) String passwordConfirm) throws IOException {
-
+		
 		if (password.compareTo("") == 0 && passwordConfirm.compareTo("") == 0) {
 			return "not-available";
 		}
 		if (password.compareTo(passwordConfirm) != 0) {
-			// response.getWriter().print( "<img
-			// src=\"/PTiTShop/images/not-available.png\"/>");
-			// return "<img src=\"/PTiTShop/images/not-available.png\"/>";
 			return "not-available";
 		} else {
-			// response.getWriter().print("<img
-			// src=\"/PTiTShop/images/available.png\"/>");
-			// return "<img src=\"/PTiTShop/images/available.png\"/>";
 			return "available";
 		}
 	}
@@ -180,15 +195,9 @@ public class AjaxController {
 	@RequestMapping(value = "/check-password", method = RequestMethod.GET)
 	public String checkPassWord(HttpServletResponse response,
 			@RequestParam(name = "password", required = true) String password) throws IOException {
-		if (!password.matches(Constants.PASSWORD_REGULAR)) {
-			// response.getWriter().print( "<img
-			// src=\"/PTiTShop/images/not-available.png\"/>");
-			// return "<img src=\"/PTiTShop/images/not-available.png\"/>";
+		if (password.equals("")) {
 			return "not-available";
 		} else {
-			// response.getWriter().print("<img
-			// src=\"/PTiTShop/images/available.png\"/>");
-			// return "<img src=\"/PTiTShop/images/available.png\"/>";
 			return "available";
 		}
 	}
@@ -198,15 +207,9 @@ public class AjaxController {
 	public String checkName(HttpServletResponse response,
 			@RequestParam(name = "lastname", required = true) String lastName) throws IOException {
 
-		if (!lastName.matches(Constants.NAME_REGULAR)) {
-			// response.getWriter().print( "<img
-			// src=\"/PTiTShop/images/not-available.png\"/>");
-			// return "<img src=\"/PTiTShop/images/not-available.png\"/>";
+		if (lastName.equals("")) {
 			return "not-available";
 		} else {
-			// response.getWriter().print("<img
-			// src=\"/PTiTShop/images/available.png\"/>");
-			// return "<img src=\"/PTiTShop/images/available.png\"/>";
 			return "available";
 		}
 	}
@@ -216,11 +219,11 @@ public class AjaxController {
 	public String checkOldPassWord(HttpServletResponse response,
 			@RequestParam(name = "username", required = true) String userName,
 			@RequestParam(name = "password", required = true) String password) throws IOException {
-
 		Account user = accountDAO.findByUserName(userName);
+		BCryptEncoder encoder = new BCryptEncoder();
 		if (user != null) {
-			String passwordHash = MD5Hash.MD5Encrypt(password + user.getSalt());
-			if (passwordHash.equals(user.getPasswordHash()))
+
+			if (encoder.matches(password, user.getPasswordHash()))
 				return "available";
 		}
 		return "not-available";
@@ -289,7 +292,7 @@ public class AjaxController {
 
 	@SuppressWarnings("el-syntax")
 	@ResponseBody
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@RequestMapping(value = "/search")
 	public String search(HttpServletResponse response, HttpServletRequest request,
 			@RequestParam(name = "inputdata", required = true, defaultValue = "") String inputData) throws IOException {
 		if (inputData.equals("")) {
@@ -298,22 +301,19 @@ public class AjaxController {
 		List<Product> resultSearchList = productDAO.searchByName(inputData);
 		String html = "";
 		if (resultSearchList.size() > 0) {
-			html += "<div><h4>Có " + resultSearchList.size() + " sản phẩm được tìm thấy</h4></div>";
+			html += "<div id='number-of-result-search'>" + resultSearchList.size() + "</div>";
 		}
 		html += "<ul>";
 		int index = 0;
 		for (Product p : resultSearchList) {
-			html += "<li><a><p><img src=\"" + p.getImage() + "\"alt=\"" + p.getName() + "\" ></p><div><h3>"
-					+ p.getName()
-					+ "</h3><del class=\"search-price\"><fmt:formatNumber value=\"${" + p.getPrice() +"}\" type=\"currency\"></fmt:formatNumber></del><span class=\"search-price\"><fmt:formatNumber value=\"${"+ p.getSalePrice() +"}\" type=\"currency\"></fmt:formatNumber></span></div></a></li>";
+			html += "<li><a class=\"link\" href=\"product?product_id="+p.getId() +"\"><p><img src=\"" + p.getImage() + "\"alt=\"" + p.getName() + "\" ></p><div><h3>"
+					+ p.getName() + "</h3><del class=\"search-price\">"+String.format("%,d",(int)p.getPrice())+"</del><span class=\"search-price\">"+String.format("%,d",(int) p.getSalePrice())+"</span></div></a></li>";
 			if (++index == 5)
 				break;
 		}
 		html += "</ul>";
 		if (resultSearchList.size() > 5) {
-			System.out.println("con;  "+ request.getContextPath());
-			
-			html += "<div><a href=\""+ request.getContextPath() +"/category/phone\">Xem thêm</a></div>";
+			html += "<div><a class=\"link\" href=\"" + request.getContextPath() + "/search?q=" + inputData + "\">Xem thêm</a></div>";
 		}
 		return html;
 

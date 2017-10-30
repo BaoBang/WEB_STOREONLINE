@@ -12,10 +12,17 @@ import java.util.List;
  */
 @Entity
 @Table(name="accounts")
-@NamedQuery(name="Account.findAll", query="SELECT a FROM Account a")
+@NamedQueries({
+	@NamedQuery(name="Account.findAll", query="SELECT a FROM Account a"),
+	@NamedQuery(name="Account.findNews", query="SELECT a FROM Account a ORDER BY a.createdAt DESC"),
+	@NamedQuery(name="Account.getTotalAccounts", query="SELECT COUNT(a) FROM Account a")
+})
 public class Account implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+	public static final String ROLE_USER = "ROLE_USER";
+	
 	public static final int STATUS_HIDDEN = 0;
 	public static final int STATUS_PUBLISH = 1;
 

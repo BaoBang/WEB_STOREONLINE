@@ -18,9 +18,8 @@
 
 		<div class="collapse navbar-collapse" id="navbarShop">
 
-			<form class="form-inline form-search">
-				<input class="form-control input-search" type="search"
-					placeholder="Tìm kiếm sản phẩm..." id="input-search">
+			<form class="form-inline form-search" action="${pageContext.request.contextPath }/search" method="get">
+				<input class="form-control input-search" type="search" autocomplete="off" placeholder="Tìm kiếm sản phẩm..." id="input-search" name="q">
 				<button class="btn btn-search" type="submit">
 					<i class="fa fa-search"></i>
 				</button>
@@ -45,7 +44,7 @@
 						<li class="nav-item-cat ${check ? ' dropdown':''}"><a
 							class="nav-link ${check ? ' dropdown-toggle':''}"
 							data-toggle="${check ? 'dropdown':''}"
-							href="${pageContext.request.contextPath}/category/${category.slug}">${category.image}
+							href="${pageContext.request.contextPath}/category/${category.slug}"><i class="fa fa-lg ${category.image}"></i>
 								${category.name}</a> <c:if test="${check}">
 								<div class="dropdown-menu dropdown-cat"
 									aria-labelledby="navbarDropdownMenuLink">
@@ -81,14 +80,15 @@
 				<c:if test="${not empty pageContext.request.userPrincipal}">
 					<li class="nav-item-cat dropdown"><a
 						class="nav-link dropdown-toggle" href="#"
-						id="userDropdownMenuLink" data-toggle="dropdown">${pageContext.request.userPrincipal.name}</a>
+						id="userDropdownMenuLink" data-toggle="dropdown"> ${user.lastName}</a>
 						<div class="dropdown-menu dropdown-cat"
 							aria-labelledby="userDropdownMenuLink">
-							<a class="dropdown-item dropdown-item-cat"
-								href="${pageContext.request.contextPath}/profile?username=${pageContext.request.userPrincipal.name}">Thông
-								tin tài khoản</a> <a class="dropdown-item dropdown-item-cat"
-								href="${pageContext.request.contextPath}/j_spring_security_logout?${_csrf.parameterName}=${_csrf.token}">Đăng
-								xuất</a>
+							<c:if test="${user.role eq 'ROLE_ADMIN'}">
+							<a class="dropdown-item dropdown-item-cat" href="${pageContext.request.contextPath}/admin" target="_blank">Trang quản trị</a> 
+							</c:if>
+							<a class="dropdown-item dropdown-item-cat" href="${pageContext.request.contextPath}/profile?username=${user.userName}">Thông tin tài khoản</a> 
+							<a class="dropdown-item dropdown-item-cat" href="${pageContext.request.contextPath}/j_spring_security_logout?${_csrf.parameterName}=${_csrf.token}">Đăng xuất</a>
+						
 						</div></li>
 				</c:if>
 

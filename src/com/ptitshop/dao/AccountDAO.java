@@ -14,4 +14,13 @@ public interface AccountDAO {
 	public boolean update(Account account);
 	public boolean checkUserName(String userName);
 	public void updateRole(Account account, String role);
+	public String getRoles(String userName);
+	public void add(Account account);
+	public void delete(Account account);
+	
+	public List<Account> findNews(int quantity);
+	public int getTotalAccounts();
+
+	public void updateAccount(Account account);
+	
 }

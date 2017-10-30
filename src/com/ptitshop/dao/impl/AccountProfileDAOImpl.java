@@ -30,20 +30,32 @@ public class AccountProfileDAOImpl implements AccountProfileDAO {
 	@Override
 	public boolean insert(AccountProfile accountProfile) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
 		session.save(accountProfile);
-		session.getTransaction().commit();
-		
 		return true;
 	}
 
 	@Override
 	public boolean update(AccountProfile accountProfile) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.saveOrUpdate(accountProfile);
-
-		session.getTransaction().commit();
+		session.merge(accountProfile);
 		return true;
+	}
+
+	@Override
+	public void add(AccountProfile accountProfile) {
+		Session session = sessionFactory.getCurrentSession();
+		session.persist(accountProfile);
+	}
+
+	@Override
+	public void delete(AccountProfile accountProfile) {
+		Session session = sessionFactory.getCurrentSession();
+		session.delete(accountProfile);
+	}
+
+	@Override
+	public void updateAccountProfile(AccountProfile accountProfile) {
+		Session session = sessionFactory.getCurrentSession();
+		session.merge(accountProfile);
 	}
 }

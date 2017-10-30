@@ -1,20 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page errorPage="//WEB-INF/jsp/error.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Admin</title>
-<jsp:include page="//WEB-INF/jsp/admin/includes/_head.jsp"></jsp:include>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/themes/css/admin.css">
+<%@ include file="//WEB-INF/jsp/admin/includes/_head.jsp" %>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
-	<div class="wrapper">
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_header.jsp"></jsp:include>
-
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_sidebar.jsp"></jsp:include>
+<c:set var="current_page_parent" value="page_promotion"></c:set>
+<c:set var="current_page" value="page_promotion_list"></c:set>
+<div class="wrapper">
+<%@ include file="//WEB-INF/jsp/admin/includes/_header.jsp" %>  
+<%@ include file="//WEB-INF/jsp/admin/includes/_sidebar.jsp" %>
 
 
 		<!-- Content Wrapper. Contains page content -->
@@ -22,13 +22,9 @@
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
 			<h1>
-				Data Tables <small>advanced tables</small>
+				Khuyến Mãi <small>PTiTShop</small>
 			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li><a href="#">Tables</a></li>
-				<li class="active">Data tables</li>
-			</ol>
+			
 			</section>
 
 
@@ -43,23 +39,23 @@
 						</div>
 						<!-- /.box-header -->
 						<div class="box-body">
-							<table id="example1" class="table table-bordered table-striped">
+							<table class="table table-bordered">
 								<thead>
 									<tr>
-										<th>ID</th>
-										<th>Hình</th>
-										<th>Tên ưu đãi</th>
-										<th>Nội dung ưu đãi</th>
-										<th>Ngày bắt đầu</th>
-										<th>Ngày kết thúc</th>
-										<th>Trạng thái</th>
+										<th style="width: 10px; text-align: center;">ID</th>
+										<th style="text-align: center;">Hình</th>
+										<th style="text-align: center;">Tên ưu đãi</th>
+										<th style="text-align: center;">Nội dung ưu đãi</th>
+										<th style="text-align: center;">Ngày bắt đầu</th>
+										<th style="text-align: center;">Ngày kết thúc</th>
+										<th style="text-align: center;">Trạng thái</th>
 										<th></th>
 									</tr>
 								</thead>
 								<tbody>
 									<c:forEach var="p" items="${result.list}">
 										<tr id="${p.id}">	
-											<td>${p.id}</td>
+											<td style="width: 10px;">${p.id}</td>
 											<td><img width="80px" height="60px" src="${p.image}"
 												alt=""></td>
 											<td>${p.name}</td>
@@ -86,31 +82,20 @@
 									</c:forEach>
 								</tbody>
 								<tfoot>
-									<tr>
-										<th>ID</th>
-										<th>Hình</th>
-										<th>Tên ưu đãi</th>
-										<th>Nội dung ưu đãi</th>
-										<th>Ngày bắt đầu</th>
-										<th>Ngày kết thúc</th>
-										<th>Trạng thái</th>
+									<tr style="text-align: center;">
+										<th style="width: 10px; text-align: center;">ID</th>
+										<th style="text-align: center;">Hình</th>
+										<th style="text-align: center;">Tên ưu đãi</th>
+										<th style="text-align: center;">Nội dung ưu đãi</th>
+										<th style="text-align: center;">Ngày bắt đầu</th>
+										<th style="text-align: center;">Ngày kết thúc</th>
+										<th style="text-align: center;">Trạng thái</th>
 										<th></th>
 									</tr>
 								</tfoot>
 							</table>
 						</div>
 						<!-- /.box-body -->
-
-						<div class="box-footer clearfix">
-							<ul class="pagination pagination-sm no-margin pull-right">
-								<li><a href="#">&laquo;</a></li>
-								<li><a href="#">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">3</a></li>
-								<li><a href="#">&raquo;</a></li>
-							</ul>
-						</div>
-
 					</div>
 					<!-- /.box -->
 				</div>
@@ -145,7 +130,7 @@
 		<!-- /.content-wrapper -->
 
 
-		<jsp:include page="//WEB-INF/jsp/admin/includes/_footer.jsp"></jsp:include>
+		<%@ include file="//WEB-INF/jsp/admin/includes/_footer.jsp" %>	
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// scroll

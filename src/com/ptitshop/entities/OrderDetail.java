@@ -10,7 +10,10 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="order_details")
-@NamedQuery(name="OrderDetail.findAll", query="SELECT o FROM OrderDetail o")
+@NamedQueries({
+	@NamedQuery(name="OrderDetail.findAll", query="SELECT o FROM OrderDetail o"),
+	@NamedQuery(name="OrderDetail.findByOrderId", query="SELECT o FROM OrderDetail o WHERE order.id=:orderId")
+})
 public class OrderDetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 

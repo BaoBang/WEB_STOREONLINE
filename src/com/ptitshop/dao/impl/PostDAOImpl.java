@@ -127,5 +127,24 @@ public class PostDAOImpl implements PostDAO {
 	
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Post> findRecentlyAddedPosts(int quantity) {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Post> query = session.createNamedQuery("Post.findRecentlyAddedPosts");
+		query.setMaxResults(quantity);
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public int getTotalPosts() {
+		Session session = sessionFactory.getCurrentSession();
+		Query<Object> query = session.createNamedQuery("Post.getTotalPosts");
+		query.setMaxResults(1);
+		int totalPosts = Integer.parseInt(String.valueOf(query.getSingleResult()));
+		return totalPosts;
+	}
+
 
 }

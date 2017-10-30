@@ -1,3 +1,4 @@
+<%@ page errorPage="error.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -18,7 +19,7 @@
       <ol class="breadcrumb breadcrumb-shop">
         <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/"><i class="fa fa-home"></i> Trang chủ</a></li>
         <c:forEach var="c" items="${category_list}"><c:if test="${c.id eq category.parentId}">
-        <li class="breadcrumb-item"><a href="#">${c.name}</a></li>
+        <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/category/${c.slug}">${c.name}</a></li>
 		</c:if></c:forEach>
         <li class="breadcrumb-item active">${category.name}</li>
       </ol>
@@ -136,7 +137,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Message</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Thông báo</h5>
         <button type="button" class="close btn-close-modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -152,7 +153,6 @@
 
 <jsp:include page="//WEB-INF/jsp/includes/_footer.jsp"></jsp:include>
 <!-- Category JS -->
-<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/category.js"></script> --%>
 <script type="text/javascript">
 $(document).ready(function(){
 	
@@ -176,17 +176,19 @@ $(document).ready(function(){
                  product_id:productId,
                  quantity:1
             },
-            /* timeout : 100000, */
+            timeout : 100000,
             success : function(result) {
                 console.log("SUCCESS: ", result);
-                
-                $('.modal-body').html('<p class="text-success">Thêm thành công <strong>' + result + '</strong> vào giỏ hàng.</p>');
-                $('#modalAddToCart').modal('show');
-                
-                reload_cart_list();
-                var totalCart = $('#total-product-in-cart').text();
-                $('#total-product-in-cart').text(Number(totalCart) + 1);
-                
+                if (result == "false") {
+                	$('.modal-body').html('<p class="text-warning">Sản phẩm tạm hết hàng!</p>');
+	                $('#modalAddToCart').modal('show');
+                } else {
+	                $('.modal-body').html('<p class="text-success">Thêm thành công <strong>' + result + '</strong> vào giỏ hàng.</p>');
+	                $('#modalAddToCart').modal('show');
+	                reload_cart_list();
+	                var totalCart = $('#total-product-in-cart').text();
+	                $('#total-product-in-cart').text(Number(totalCart) + 1);
+                }
              	// 2 giay sau sẽ tắt popup
                 /* setTimeout(function(){
                     $('#modalAddToCart').modal('hide');
@@ -208,7 +210,6 @@ $(document).ready(function(){
             contentType : "application/json;charset=UTF-8",
             dataType: "text",
             success : function(data) {
-               console.log("SUCCESS: ", data);
 			   $('#container-cart').empty();
 			   $('#container-cart').html(data);
 		

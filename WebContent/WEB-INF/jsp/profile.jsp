@@ -1,6 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page errorPage="error.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -19,7 +19,7 @@
 				<div class="row card-deck">
 					<div class="col-md-4 card profile-img">
 
-						<img src="images/avatar-75.png" alt="" class="img-fluid pf-img">
+						<img src="${user.avatar }" alt="" class="img-fluid pf-img">
 
 					</div>
 					<div class="col-md-8 card profile-emp"></div>
@@ -31,10 +31,10 @@
 				<div class="profile row card-deck">
 					<div class="col-md-4 pf-tab card">
 						<ul class="nav nav-tabs">
-							<li class="nav-item "><a href="#profile-info"
+							<li class="nav-item change-tab"><a href="#profile-info"
 								class="nav-link active" data-toggle="tab" role="tab">Thông Tin cá
 									Nhân</a></li>
-							<li class="nav-item"><a href="#profile-password"
+							<li class="nav-item change-tab"><a href="#profile-password"
 								class="nav-link" data-toggle="tab" role="tab">Thay đổi mật
 									khẩu</a></li>
 						</ul>
@@ -47,8 +47,8 @@
 									<h4>
 										<i class="fa fa-address-card-o" aria-hidden="true"></i> Thông
 										tin cá nhân <span class="float-md-right"><button
-												type="button" id="btnUpdate" class="btn btn-link"
-												onclick="$('.edit').removeAttr('disabled');">Chỉnh
+												type="button"  class="btn btn-link btnUpdate"
+												>Chỉnh
 												sửa</button></span>
 									</h4>
 								</div>
@@ -145,8 +145,8 @@
 									<h4>
 										<i class="fa fa-lock" aria-hidden="true"></i> Thay đổi mật
 										khẩu <span class="float-md-right"><button type="button"
-												id="btnUpdate" class="btn btn-link"
-												onclick="$('.edit-pass').removeAttr('disabled');">Chỉnh
+												 class="btn btn-link btnUpdate"
+												>Chỉnh
 												sửa</button></span>
 									</h4>
 								</div>
@@ -174,7 +174,7 @@
 											<label class="control-label" for="password-comfirm"><span
 												class="glyphicon glyphicon-user"> </span>Xác nhận mật khẩu
 												mới</span> </label> <input class="form-control required edit-pass"
-												minlength="6" id="comfirm-pass" name="spassword-comfirm"
+												minlength="6" id="comfirm-pass" name="password-comfirm"
 												type="password" class="text" value="" disabled="disabled">
 											<span id="password-comfirm-result"></span>
 										</div>
@@ -203,6 +203,19 @@
 	<jsp:include page="//WEB-INF/jsp/includes/_footer.jsp"></jsp:include>
 
 	<script type="text/javascript">
+		$(document).ready(function(){
+
+				$('.btnUpdate').on('click', function(){
+					$('.edit-pass').removeAttr('disabled');
+					$('.edit').removeAttr('disabled');
+					$(this).css('display','none');
+				});
+				$('.change-tab').on('click',function(){
+					$('.edit-pass').attr('disabled', true);
+					$('.edit').attr('disabled', true);
+					$('.btnUpdate').css('display','block');
+				});
+		});
 		/** ************* Check old password  ************************ */
 		var x_timer, x_timer2, old_password_flag = false, password_comfirm_flag = false, new_password_flag = false;
 		$("#old-pass").keyup(function(e) {
@@ -216,7 +229,7 @@
 		function check_old_password_ajax(user_name, old_pass) {
 
 			$("#old-password-result").html(
-					'<img src="/PTiTShop/images/ajax-loader.gif" />');
+					'<img src="/PTiTShop/themes/images/ajax-loader.gif" />');
 			$
 					.ajax({
 						type : "GET",
@@ -230,12 +243,12 @@
 								old_password_flag = true;
 								$("#old-password-result")
 										.html(
-												"<img src=\"/PTiTShop/images/available.png\"/>");
+												"<img src=\"/PTiTShop/themes/images/available.png\"/>");
 							} else {
 								old_password_flag = false;
 								$("#old-password-result")
 										.html(
-												"<img src=\"/PTiTShop/images/not-available.png\"/>");
+												"<img src=\"/PTiTShop/themes/images/not-available.png\"/>");
 							}
 							if (old_password_flag == true
 									&& new_password_flag == true
@@ -270,7 +283,7 @@
 		function check_password_ajax(pass_word) {
 
 			$("#new-password-result").html(
-					'<img src="/PTiTShop/images/ajax-loader.gif" />');
+					'<img src="/PTiTShop/themes/images/ajax-loader.gif" />');
 			$
 					.ajax({
 						type : "GET",
@@ -283,12 +296,12 @@
 								new_password_flag = true;
 								$("#new-password-result")
 										.html(
-												"<img src=\"/PTiTShop/images/available.png\"/>");
+												"<img src=\"/PTiTShop/themes/images/available.png\"/>");
 							} else {
 								new_password_flag = false;
 								$("#new-password-result")
 										.html(
-												"<img src=\"/PTiTShop/images/not-available.png\"/>");
+												"<img src=\"/PTiTShop/themes/images/not-available.png\"/>");
 							}
 							if (old_password_flag == true
 									&& new_password_flag == true
@@ -320,7 +333,7 @@
 		function check_password_comfirm_ajax(pass_word, password_comfirm) {
 
 			$("#password-comfirm-result").html(
-					'<img src="/PTiTShop/images/ajax-loader.gif" />');
+					'<img src="/PTiTShop/themes/images/ajax-loader.gif" />');
 			$
 					.ajax({
 						type : "GET",
@@ -334,12 +347,12 @@
 								password_comfirm_flag = true;
 								$("#password-comfirm-result")
 										.html(
-												"<img src=\"/PTiTShop/images/available.png\"/>");
+												"<img src=\"/PTiTShop/themes/images/available.png\"/>");
 							} else {
 								password_comfirm_flag = false;
 								$("#password-comfirm-result")
 										.html(
-												"<img src=\"/PTiTShop/images/not-available.png\"/>");
+												"<img src=\"/PTiTShop/themes/images/not-available.png\"/>");
 							}
 							if (old_password_flag == true
 									&& new_password_flag == true
